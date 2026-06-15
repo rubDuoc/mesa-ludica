@@ -1,0 +1,76 @@
+<section class="banner-registro">
+  <h1>Crea tu cuenta</h1>
+  <p>Regístrate para acumular beneficios y un seguimiento de tus compras.</p>
+</section>
+
+<main>
+  <section class="seccion">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+
+          <div class="formulario-card">
+            <h2 class="h4 mb-1">Formulario de registro</h2>
+            <p class="text-muted mb-4">Escribe en los campos y observa la vista previa actualizarse en vivo.</p>
+
+            <!-- Formulario con enlace bidireccional [(ngModel)]. Sin validaciones. -->
+            <form>
+              <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre completo</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" [(ngModel)]="nombre">
+              </div>
+
+              <div class="mb-3">
+                <label for="usuario" class="form-label">Nombre de usuario</label>
+                <input type="text" class="form-control" id="usuario" name="usuario" [(ngModel)]="usuario">
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="email" name="email" [(ngModel)]="email">
+              </div>
+
+              <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="nacimiento" class="form-label">Fecha de nacimiento</label>
+                  <input type="date" class="form-control" id="nacimiento" name="nacimiento" [(ngModel)]="nacimiento">
+                </div>
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="direccion" class="form-label">Dirección de despacho</label>
+                  <input type="text" class="form-control" id="direccion" name="direccion" [(ngModel)]="direccion">
+                </div>
+              </div>
+
+              <div class="d-flex flex-wrap gap-2 mt-3">
+                <button type="button" class="boton boton-secundario" (click)="limpiar()">Limpiar formulario</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- *ngIf: la vista previa aparece solo cuando hay algún dato escrito.
+               Muestra el enlace unidireccional {{ }} reflejando lo que se escribe. -->
+          <div class="formulario-card previa-datos mt-4" *ngIf="tieneDatos">
+            <h3 class="h5 mb-3">Vista previa de tus datos</h3>
+            <dl class="row mb-0">
+              <dt class="col-sm-4">Nombre</dt>
+              <dd class="col-sm-8">{{ nombre || '—' }}</dd>
+
+              <dt class="col-sm-4">Usuario</dt>
+              <dd class="col-sm-8">{{ usuario || '—' }}</dd>
+
+              <dt class="col-sm-4">Correo</dt>
+              <dd class="col-sm-8">{{ email || '—' }}</dd>
+
+              <dt class="col-sm-4">Nacimiento</dt>
+              <dd class="col-sm-8">{{ nacimiento || '—' }}</dd>
+
+              <dt class="col-sm-4">Dirección</dt>
+              <dd class="col-sm-8">{{ direccion || '—' }}</dd>
+            </dl>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

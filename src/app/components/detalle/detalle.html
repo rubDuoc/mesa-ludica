@@ -1,0 +1,50 @@
+<main>
+  <section class="seccion">
+    <div class="container">
+
+      <!-- *ngIf: producto encontrado -->
+      <div class="detalle-producto" *ngIf="producto">
+        <div class="row g-0">
+          <div class="col-12 col-md-5">
+            <img [src]="'/' + producto.imagen" [alt]="'Juego ' + producto.nombre">
+          </div>
+          <div class="col-12 col-md-7">
+            <div class="detalle-cuerpo">
+              <span class="badge-categoria">{{ producto.categoria }}</span>
+              <h1>{{ producto.nombre }}</h1>
+              <p class="descripcion">{{ producto.descripcion }}</p>
+
+              <div class="mb-3">
+                <span class="precio-antiguo" *ngIf="descuento > 0">{{ formatearPrecio(producto.precio_antiguo!) }}</span>
+                <span class="precio">{{ formatearPrecio(producto.precio) }}</span>
+                <span class="etiqueta-descuento position-static d-inline-block ms-2"
+                      *ngIf="descuento > 0" style="position: static;">-{{ descuento }}%</span>
+              </div>
+
+              <!-- *ngIf con else: estado del stock -->
+              <p class="detalle-stock" *ngIf="producto.stock > 0; else sinStock">
+                ✔ En stock ({{ producto.stock }} unidades disponibles)
+              </p>
+              <ng-template #sinStock>
+                <p class="detalle-stock agotado">✖ Producto agotado</p>
+              </ng-template>
+
+              <div class="d-flex flex-wrap gap-2 mt-4">
+                <a class="boton" [routerLink]="['/categoria', producto.categoria]">← Volver a {{ producto.categoria }}</a>
+                <a class="boton boton-secundario" routerLink="/inicio">Ir al inicio</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- *ngIf: id inexistente -->
+      <div class="text-center py-5" *ngIf="!producto">
+        <h2>Producto no encontrado</h2>
+        <p class="text-muted">El juego que buscas no existe o fue retirado del catálogo.</p>
+        <a class="boton" routerLink="/inicio">Volver al inicio</a>
+      </div>
+
+    </div>
+  </section>
+</main>

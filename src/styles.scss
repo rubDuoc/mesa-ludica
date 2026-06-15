@@ -1,0 +1,561 @@
+/* ============================================================
+   Mesa Lúdica - Hoja de estilos global
+   DSY2202 - Desarrollo Full Stack II - Experiencia 2, Semana 4
+   Migración a Angular del estilo creado en la Experiencia 1.
+   ============================================================ */
+
+/* ----- 1. VARIABLES CSS (variables personalizadas) ----- */
+:root {
+  /* Paleta de marca */
+  --color-primario: #1e3a8a;
+  --color-secundario: #0ea5e9;
+  --color-acento: #f59e0b;
+  --color-exito: #16a34a;
+  --color-peligro: #dc2626;
+
+  /* Neutros */
+  --color-fondo: #f4f6fb;
+  --color-superficie: #ffffff;
+  --color-texto: #1f2937;
+  --color-texto-suave: #6b7280;
+
+  /* Colores por categoría */
+  --cat-estrategia: #1e3a8a;
+  --cat-familiares: #15803d;
+  --cat-fiesta: #9333ea;
+  --cat-cartas: #b45309;
+
+  /* Tipografía y espaciado */
+  --fuente-base: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --radio: 14px;
+  --sombra: 0 8px 24px rgba(15, 23, 42, 0.12);
+  --sombra-fuerte: 0 14px 36px rgba(15, 23, 42, 0.22);
+  --transicion: 0.3s ease;
+  --ancho-max: 1100px;
+
+  /* Override de variables de Bootstrap para que use nuestra paleta */
+  --bs-primary: var(--color-primario);
+  --bs-primary-rgb: 30, 58, 138;
+}
+
+/* ----- 2. RESET BÁSICO ----- */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--fuente-base);
+  color: var(--color-texto);
+  background-color: var(--color-fondo);
+  line-height: 1.6;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ----- 3. ANIMACIONES (@keyframes) ----- */
+@keyframes aparecer {
+  from { transform: translateY(24px); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes bajarHeader {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes latir {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.12); }
+}
+
+@keyframes flotar {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+@keyframes brillo {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ----- 4. UTILIDADES ----- */
+.seccion {
+  padding: 50px 0;
+}
+
+.titulo-seccion {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.subtitulo-seccion {
+  text-align: center;
+  color: var(--color-texto-suave);
+  margin-bottom: 40px;
+}
+
+/* ----- 5. ENCABEZADO Y NAVEGACIÓN ----- */
+.cabecera {
+  background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+  color: #fff;
+  box-shadow: var(--sombra);
+  animation: bajarHeader 0.6s ease both;
+  transition: padding var(--transicion), box-shadow var(--transicion);
+}
+
+.cabecera .navbar {
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+}
+
+.cabecera .navbar-brand.logo {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cabecera .navbar-brand.logo span {
+  font-size: 1.8rem;
+  display: inline-block;
+  animation: flotar 3s ease-in-out infinite;
+}
+
+.cabecera .navbar-nav .nav-link {
+  color: #ffffff;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 999px;
+  transition: background var(--transicion), transform var(--transicion);
+}
+
+.cabecera .navbar-nav .nav-link:hover,
+.cabecera .navbar-nav .nav-link:focus {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+  color: #fff;
+}
+
+.cabecera .navbar-nav .nav-link.active {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.cabecera .nav-link.nav-cta {
+  background: var(--color-acento);
+  color: #fff;
+}
+
+.cabecera .nav-link.nav-cta:hover,
+.cabecera .nav-link.nav-cta:focus {
+  background: #e08e07;
+  color: #fff;
+}
+
+.cabecera .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.cabecera .navbar-toggler:focus {
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+}
+.cabecera .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255,255,255,0.95%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* ----- 6. HERO (portada de inicio) ----- */
+.hero {
+  text-align: center;
+  padding: 70px 20px;
+  background: linear-gradient(120deg, #e0f2fe, #ede9fe, #fef3c7);
+  background-size: 200% auto;
+  animation: brillo 8s linear infinite;
+}
+
+.hero h1 {
+  font-size: 2.6rem;
+  margin-bottom: 12px;
+  color: var(--color-primario);
+}
+
+.hero p {
+  font-size: 1.15rem;
+  color: var(--color-texto-suave);
+  max-width: 620px;
+  margin: 0 auto 24px;
+}
+
+.boton {
+  display: inline-block;
+  background: var(--color-acento);
+  color: #fff;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 999px;
+  font-weight: 700;
+  box-shadow: var(--sombra);
+  transition: transform var(--transicion), box-shadow var(--transicion), background var(--transicion);
+  cursor: pointer;
+}
+
+.boton:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: var(--sombra-fuerte);
+  color: #fff;
+}
+
+.boton-secundario {
+  background: var(--color-texto-suave);
+}
+.boton-secundario:hover {
+  background: #4b5563;
+}
+
+.boton-agregar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  background: var(--color-exito);
+}
+.boton-agregar:hover {
+  background: #15803d;
+}
+
+/* ----- 7. TARJETAS DE CATEGORÍA (página principal) ----- */
+.tarjeta-categoria {
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+  overflow: hidden;
+  box-shadow: var(--sombra);
+  transition: transform var(--transicion), box-shadow var(--transicion);
+  animation: aparecer 0.6s ease both;
+  display: flex;
+  flex-direction: column;
+}
+
+.tarjeta-categoria:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--sombra-fuerte);
+}
+
+.tarjeta-categoria img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+}
+
+.tarjeta-categoria .cuerpo {
+  padding: 18px;
+  text-align: center;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.tarjeta-categoria h3 {
+  font-size: 1.3rem;
+  margin-bottom: 6px;
+}
+
+.tarjeta-categoria p {
+  color: var(--color-texto-suave);
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+  flex-grow: 1;
+}
+
+/* ----- 8. BANNER DE CATEGORÍA (página interior) ----- */
+.banner-categoria {
+  position: relative;
+  color: #fff;
+  text-align: center;
+  padding: 60px 20px;
+  background-size: cover;
+  background-position: center;
+}
+
+.banner-categoria::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.banner-categoria h1,
+.banner-categoria p {
+  position: relative;
+  z-index: 1;
+}
+
+.banner-categoria h1 {
+  font-size: 2.4rem;
+  margin-bottom: 8px;
+}
+
+/* ----- 9. FICHAS DE JUEGOS ----- */
+.ficha {
+  position: relative;
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+  overflow: hidden;
+  box-shadow: var(--sombra);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transicion), box-shadow var(--transicion);
+  animation: aparecer 0.6s ease both;
+}
+
+.ficha:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--sombra-fuerte);
+}
+
+.ficha img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.ficha .cuerpo {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.ficha h3 {
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+}
+
+.ficha .descripcion {
+  color: var(--color-texto-suave);
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  flex-grow: 1;
+}
+
+.ficha .pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Precios */
+.precio {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-primario);
+}
+
+.precio-antiguo {
+  font-size: 0.95rem;
+  color: var(--color-texto-suave);
+  text-decoration: line-through;
+  margin-right: 6px;
+}
+
+/* Etiqueta de descuento */
+.etiqueta-descuento {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--color-peligro);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: 999px;
+  box-shadow: var(--sombra);
+  animation: latir 1.4s ease-in-out infinite;
+  z-index: 2;
+}
+
+.etiqueta-sin-descuento {
+  font-size: 0.8rem;
+  color: var(--color-texto-suave);
+  font-style: italic;
+}
+
+/* ----- 10. FORMULARIOS (registro) ----- */
+.banner-registro {
+  position: relative;
+  color: #fff;
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, var(--color-primario), var(--color-secundario), var(--color-acento));
+  background-size: 200% auto;
+  animation: brillo 10s linear infinite;
+}
+
+.banner-registro h1 {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.banner-registro p {
+  position: relative;
+  z-index: 1;
+  opacity: 0.95;
+}
+
+.formulario-card {
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 30px;
+  animation: aparecer 0.6s ease both;
+}
+
+.formulario-card .form-label {
+  font-weight: 600;
+  color: var(--color-texto);
+}
+
+.formulario-card .form-control:focus,
+.formulario-card .form-select:focus {
+  border-color: var(--color-secundario);
+  box-shadow: 0 0 0 0.2rem rgba(14, 165, 233, 0.18);
+}
+
+/* Vista previa en vivo del formulario (ngModel) */
+.previa-datos {
+  background: var(--color-fondo);
+  border-radius: var(--radio);
+  padding: 20px 24px;
+  margin-top: 8px;
+}
+
+.previa-datos dt {
+  color: var(--color-texto-suave);
+  font-weight: 600;
+}
+
+.previa-datos dd {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* ----- 11. DETALLE DE PRODUCTO ----- */
+.detalle-producto {
+  background: var(--color-superficie);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+  animation: aparecer 0.6s ease both;
+}
+
+.detalle-producto img {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  object-fit: cover;
+}
+
+.detalle-cuerpo {
+  padding: 30px;
+}
+
+.detalle-cuerpo h1 {
+  font-size: 2rem;
+  margin-bottom: 6px;
+}
+
+.badge-categoria {
+  display: inline-block;
+  background: var(--color-secundario);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  padding: 4px 14px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+
+.detalle-cuerpo .descripcion {
+  color: var(--color-texto-suave);
+  margin-bottom: 18px;
+}
+
+.detalle-stock {
+  color: var(--color-exito);
+  font-weight: 600;
+}
+.detalle-stock.agotado {
+  color: var(--color-peligro);
+}
+
+/* ----- 12. PIE DE PÁGINA ----- */
+.pie-pagina {
+  background: var(--color-texto);
+  color: #e5e7eb;
+  text-align: center;
+  padding: 30px 20px;
+  margin-top: 40px;
+}
+
+.pie-pagina a {
+  color: var(--color-acento);
+  font-weight: 600;
+}
+
+/* ----- 13. DISEÑO RESPONSIVO (media queries) ----- */
+@media screen and (max-width: 991.98px) {
+  .cabecera .navbar-collapse {
+    width: 100%;
+  }
+  .cabecera .navbar-nav {
+    width: 100%;
+    margin-top: 12px;
+    gap: 6px;
+  }
+  .cabecera .navbar-nav .nav-item {
+    width: 100%;
+  }
+  .cabecera .navbar-nav .nav-link {
+    display: block;
+    width: 100%;
+    text-align: center;
+    border-radius: 12px;
+  }
+  .cabecera .navbar-nav .nav-link:hover,
+  .cabecera .navbar-nav .nav-link:focus {
+    transform: none;
+  }
+  .cabecera .nav-item:has(> .nav-cta) {
+    margin-top: 6px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .hero h1 { font-size: 2rem; }
+  .titulo-seccion { font-size: 1.6rem; }
+  .banner-categoria h1,
+  .banner-registro h1 { font-size: 1.8rem; }
+  .formulario-card { padding: 22px; }
+  .detalle-producto img { min-height: 240px; }
+}
+
+@media screen and (max-width: 480px) {
+  .hero { padding: 50px 16px; }
+  .hero h1 { font-size: 1.7rem; }
+  .formulario-card { padding: 18px; }
+  .boton { padding: 10px 22px; }
+}

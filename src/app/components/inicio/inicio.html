@@ -1,0 +1,37 @@
+<!-- HERO / PORTADA -->
+<section class="hero">
+  <div class="container">
+    <h1>Bienvenido a Mesa Lúdica</h1>
+    <p>
+      Somos una PYME apasionada por los juegos de mesa. Explora nuestro catálogo
+      organizado en categorías y encuentra el juego perfecto para tu próxima partida.
+    </p>
+    <a href="#categorias" class="boton">Ver categorías</a>
+  </div>
+</section>
+
+<!-- CONTENIDO PRINCIPAL -->
+<main>
+  <section id="categorias" class="seccion">
+    <div class="container">
+      <h2 class="titulo-seccion">Nuestras categorías</h2>
+      <p class="subtitulo-seccion">Elige una categoría para ver los juegos disponibles</p>
+
+      <div class="row g-4 grid-categorias">
+
+        <!-- *ngFor: una tarjeta por cada categoría (datos estáticos) -->
+        <article class="col-12 col-sm-6 col-lg-3" *ngFor="let cat of categorias">
+          <div class="tarjeta-categoria h-100">
+            <img [src]="'/' + cat.imagen" [alt]="'Categoría ' + cat.nombre">
+            <div class="cuerpo">
+              <h3>{{ cat.nombre }}</h3>
+              <p>{{ cat.descripcion }}</p>
+              <a class="boton" [routerLink]="['/categoria', cat.slug]">Explorar</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+</main>

@@ -1,0 +1,44 @@
+<!-- BANNER de la categoría (la imagen de fondo se arma con la variable slug) -->
+<section class="banner-categoria" [style.background-image]="'url(/img/cat-' + slug + '.svg)'">
+  <h1>{{ titulo }}</h1>
+  <p>{{ bajada }}</p>
+</section>
+
+<main>
+  <section class="seccion">
+    <div class="container">
+
+      <!-- *ngIf: mensaje cuando la categoría no tiene productos -->
+      <p *ngIf="productos.length === 0" class="text-center text-muted py-5">
+        No hay productos disponibles en esta categoría por el momento.
+      </p>
+
+      <!-- *ngFor: una ficha por producto de la categoría -->
+      <div class="row g-4" *ngIf="productos.length > 0">
+        <article class="col-12 col-md-6 col-lg-4" *ngFor="let p of productos">
+          <div class="ficha h-100">
+
+            <!-- *ngIf: la etiqueta de descuento solo aparece si hay oferta -->
+            <span class="etiqueta-descuento" *ngIf="descuento(p) > 0">-{{ descuento(p) }}%</span>
+
+            <img [src]="'/' + p.imagen" [alt]="'Juego ' + p.nombre">
+            <div class="cuerpo">
+              <h3>{{ p.nombre }}</h3>
+              <p class="descripcion">{{ p.descripcion }}</p>
+              <div class="pie">
+                <div>
+                  <span class="precio-antiguo" *ngIf="descuento(p) > 0">{{ formatearPrecio(p.precio_antiguo!) }}</span>
+                  <span class="precio">{{ formatearPrecio(p.precio) }}</span>
+                </div>
+                <!-- Navega al detalle pasando el id por la URL -->
+                <a class="boton boton-agregar" [routerLink]="['/detalle', p.id]">Ver detalle 🔍</a>
+              </div>
+            </div>
+
+          </div>
+        </article>
+      </div>
+
+    </div>
+  </section>
+</main>
