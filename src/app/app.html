@@ -1,32 +1,8 @@
-<!-- ENCABEZADO + NAVEGACIÓN (Bootstrap navbar responsive) -->
-<header class="cabecera sticky-top">
-  <nav class="navbar navbar-expand-lg container">
-    <a class="navbar-brand logo" routerLink="/inicio">
-      <span>🎲</span> Mesa Lúdica
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navMenu" aria-controls="navMenu"
-            aria-expanded="false" aria-label="Abrir navegación">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav ms-auto align-items-lg-center menu">
-        <li class="nav-item"><a class="nav-link" routerLink="/inicio" routerLinkActive="active">Inicio</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/categoria/estrategia" routerLinkActive="active">Estrategia</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/categoria/familiares" routerLinkActive="active">Familiares</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/categoria/fiesta" routerLinkActive="active">Fiesta</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/categoria/cartas" routerLinkActive="active">Cartas</a></li>
-        <li class="nav-item ms-lg-2"><a class="nav-link nav-cta" routerLink="/registro" routerLinkActive="active">Registrarse</a></li>
-      </ul>
-    </div>
-  </nav>
-</header>
+<!-- Encabezado reutilizable -->
+<app-header></app-header>
 
 <!-- Aquí se cargan las páginas según la ruta -->
 <router-outlet></router-outlet>
 
-<!-- PIE DE PÁGINA -->
-<footer class="pie-pagina">
-  <p>&copy; 2026 Mesa Lúdica.</p>
-  <p><a routerLink="/inicio">Volver al inicio</a></p>
-</footer>
+<!-- Pie de página reutilizable -->
+<app-footer></app-footer>

@@ -1,1 +1,10 @@
 /* Estilos propios del componente Detalle (el diseño base está en styles.scss global) */
+
+.mensaje-carrito {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  background: #e7f6ec;
+  color: #1d7a44;
+  font-weight: 600;
+}

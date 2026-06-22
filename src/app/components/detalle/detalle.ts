@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { PRODUCTOS } from '../../data/productos';
+import { ProductoService } from '../../services/producto.service';
+import { CarritoService } from '../../services/carrito.service';
 import { Producto } from '../../models/producto';
 
 @Component({
@@ -12,26 +13,35 @@ import { Producto } from '../../models/producto';
 })
 export class Detalle implements OnInit {
   producto?: Producto;
+  agregado = false;
 
-  constructor(private ruta: ActivatedRoute) {}
+  constructor(
+    private ruta: ActivatedRoute,
+    private productoService: ProductoService,
+    private carrito: CarritoService
+  ) {}
 
   ngOnInit(): void {
     // Recibe el id enviado desde la página de categoría (/detalle/:id)
     this.ruta.paramMap.subscribe(params => {
-      const id = params.get('id');
-      this.producto = PRODUCTOS.find(p => p.id === id);
+      this.producto = this.productoService.getProductoPorId(params.get('id'));
+      this.agregado = false;
     });
   }
 
   get descuento(): number {
-    const p = this.producto;
-    if (!p || !p.precio_antiguo || p.precio_antiguo <= p.precio) {
-      return 0;
-    }
-    return Math.round((1 - p.precio / p.precio_antiguo) * 100);
+    return this.producto ? this.productoService.descuento(this.producto) : 0;
   }
 
   formatearPrecio(n: number): string {
-    return '$' + Number(n).toLocaleString('es-CL');
+    return this.productoService.formatearPrecio(n);
+  }
+
+  // Acción inicial de compra: suma el producto al carrito y confirma en pantalla.
+  agregarAlCarrito(): void {
+    if (this.producto && this.producto.stock > 0) {
+      this.carrito.agregar(this.producto);
+      this.agregado = true;
+    }
   }
 }

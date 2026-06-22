@@ -30,9 +30,19 @@
               </ng-template>
 
               <div class="d-flex flex-wrap gap-2 mt-4">
-                <a class="boton" [routerLink]="['/categoria', producto.categoria]">← Volver a {{ producto.categoria }}</a>
+                <!-- Acción de carrito: solo si hay stock (*ngIf) -->
+                <button type="button" class="boton boton-agregar"
+                        *ngIf="producto.stock > 0" (click)="agregarAlCarrito()">
+                  🛒 Agregar al carrito
+                </button>
+                <a class="boton boton-secundario" [routerLink]="['/categoria', producto.categoria]">← Volver a {{ producto.categoria }}</a>
                 <a class="boton boton-secundario" routerLink="/inicio">Ir al inicio</a>
               </div>
+
+              <!-- Confirmación tras agregar al carrito (*ngIf) -->
+              <p class="mensaje-carrito mt-3" *ngIf="agregado">
+                ✔ ¡Producto agregado al carrito!
+              </p>
             </div>
           </div>
         </div>

@@ -11,61 +11,131 @@
 
           <div class="formulario-card">
             <h2 class="h4 mb-1">Formulario de registro</h2>
-            <p class="text-muted mb-4">Escribe en los campos y observa la vista previa actualizarse en vivo.</p>
+            <p class="text-muted mb-4">Completa los campos. Las validaciones se definen en TypeScript con Reactive Forms.</p>
 
-            <!-- Formulario con enlace bidireccional [(ngModel)]. Sin validaciones. -->
-            <form>
+            <!-- Formulario reactivo: se enlaza al FormGroup y valida al enviar -->
+            <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+
+              <!-- Nombre completo -->
               <div class="mb-3">
                 <label for="nombre" class="form-label">Nombre completo</label>
-                <input type="text" class="form-control" id="nombre" name="nombre" [(ngModel)]="nombre">
+                <input type="text" class="form-control" id="nombre" formControlName="nombre"
+                       [class.is-invalid]="nombre.invalid && (nombre.touched || enviado)">
+                <small class="text-danger" *ngIf="nombre.errors?.['required'] && (nombre.touched || enviado)">
+                  El nombre es obligatorio.
+                </small>
+                <small class="text-danger" *ngIf="nombre.errors?.['minlength'] && (nombre.touched || enviado)">
+                  El nombre debe tener al menos 3 caracteres.
+                </small>
               </div>
 
+              <!-- Nombre de usuario -->
               <div class="mb-3">
                 <label for="usuario" class="form-label">Nombre de usuario</label>
-                <input type="text" class="form-control" id="usuario" name="usuario" [(ngModel)]="usuario">
+                <input type="text" class="form-control" id="usuario" formControlName="usuario"
+                       [class.is-invalid]="usuario.invalid && (usuario.touched || enviado)">
+                <small class="text-danger" *ngIf="usuario.errors?.['required'] && (usuario.touched || enviado)">
+                  El usuario es obligatorio.
+                </small>
+                <small class="text-danger" *ngIf="usuario.errors?.['minlength'] && (usuario.touched || enviado)">
+                  El usuario debe tener al menos 4 caracteres.
+                </small>
               </div>
 
+              <!-- Correo electrónico -->
               <div class="mb-3">
                 <label for="email" class="form-label">Correo electrónico</label>
-                <input type="email" class="form-control" id="email" name="email" [(ngModel)]="email">
+                <input type="email" class="form-control" id="email" formControlName="email"
+                       [class.is-invalid]="email.invalid && (email.touched || enviado)">
+                <small class="text-danger" *ngIf="email.errors?.['required'] && (email.touched || enviado)">
+                  El correo es obligatorio.
+                </small>
+                <small class="text-danger" *ngIf="email.errors?.['email'] && (email.touched || enviado)">
+                  Ingresa un correo con formato válido.
+                </small>
+              </div>
+
+              <!-- Contraseña -->
+              <div class="mb-3">
+                <label for="contrasena" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="contrasena" formControlName="contrasena"
+                       [class.is-invalid]="contrasena.invalid && (contrasena.touched || enviado)">
+                <small class="text-danger" *ngIf="contrasena.errors?.['required'] && (contrasena.touched || enviado)">
+                  La contraseña es obligatoria.
+                </small>
+                <small class="text-danger" *ngIf="(contrasena.errors?.['minlength'] || contrasena.errors?.['maxlength']) && (contrasena.touched || enviado)">
+                  La contraseña debe tener entre 6 y 18 caracteres.
+                </small>
+                <small class="text-danger" *ngIf="contrasena.errors?.['fuerza'] && (contrasena.touched || enviado)">
+                  La contraseña debe incluir al menos un número y una mayúscula.
+                </small>
+              </div>
+
+              <!-- Repetir contraseña -->
+              <div class="mb-3">
+                <label for="confirmarContrasena" class="form-label">Repetir contraseña</label>
+                <input type="password" class="form-control" id="confirmarContrasena" formControlName="confirmarContrasena"
+                       [class.is-invalid]="(confirmarContrasena.invalid || formulario.errors?.['contrasenasDistintas']) && (confirmarContrasena.touched || enviado)">
+                <small class="text-danger" *ngIf="confirmarContrasena.errors?.['required'] && (confirmarContrasena.touched || enviado)">
+                  Debes repetir la contraseña.
+                </small>
+                <small class="text-danger" *ngIf="formulario.errors?.['contrasenasDistintas'] && !confirmarContrasena.errors?.['required'] && (confirmarContrasena.touched || enviado)">
+                  Las contraseñas no coinciden.
+                </small>
               </div>
 
               <div class="row">
+                <!-- Fecha de nacimiento -->
                 <div class="col-12 col-md-6 mb-3">
                   <label for="nacimiento" class="form-label">Fecha de nacimiento</label>
-                  <input type="date" class="form-control" id="nacimiento" name="nacimiento" [(ngModel)]="nacimiento">
+                  <input type="date" class="form-control" id="nacimiento" formControlName="nacimiento"
+                         [class.is-invalid]="nacimiento.invalid && (nacimiento.touched || enviado)">
+                  <small class="text-danger" *ngIf="nacimiento.errors?.['required'] && (nacimiento.touched || enviado)">
+                    La fecha de nacimiento es obligatoria.
+                  </small>
+                  <small class="text-danger" *ngIf="nacimiento.errors?.['menorDeEdad'] && (nacimiento.touched || enviado)">
+                    Debes tener al menos 13 años para registrarte.
+                  </small>
                 </div>
+
+                <!-- Dirección de despacho (opcional) -->
                 <div class="col-12 col-md-6 mb-3">
-                  <label for="direccion" class="form-label">Dirección de despacho</label>
-                  <input type="text" class="form-control" id="direccion" name="direccion" [(ngModel)]="direccion">
+                  <label for="direccion" class="form-label">Dirección de despacho <span class="text-muted">(opcional)</span></label>
+                  <input type="text" class="form-control" id="direccion" formControlName="direccion">
                 </div>
               </div>
 
+              <!-- Mensaje de éxito cuando el formulario es válido (*ngIf) -->
+              <div class="alert alert-success" *ngIf="enviado && formulario.valid">
+                ✔ ¡Registro válido! (demostración, sin envío real todavía).
+              </div>
+
               <div class="d-flex flex-wrap gap-2 mt-3">
+                <button type="submit" class="boton">Registrarme</button>
                 <button type="button" class="boton boton-secundario" (click)="limpiar()">Limpiar formulario</button>
               </div>
             </form>
           </div>
 
           <!-- *ngIf: la vista previa aparece solo cuando hay algún dato escrito.
-               Muestra el enlace unidireccional {{ }} reflejando lo que se escribe. -->
+               No incluye las contraseñas. -->
           <div class="formulario-card previa-datos mt-4" *ngIf="tieneDatos">
             <h3 class="h5 mb-3">Vista previa de tus datos</h3>
             <dl class="row mb-0">
               <dt class="col-sm-4">Nombre</dt>
-              <dd class="col-sm-8">{{ nombre || '—' }}</dd>
+              <dd class="col-sm-8">{{ formulario.value.nombre || '—' }}</dd>
 
               <dt class="col-sm-4">Usuario</dt>
-              <dd class="col-sm-8">{{ usuario || '—' }}</dd>
+              <dd class="col-sm-8">{{ formulario.value.usuario || '—' }}</dd>
 
               <dt class="col-sm-4">Correo</dt>
-              <dd class="col-sm-8">{{ email || '—' }}</dd>
+              <dd class="col-sm-8">{{ formulario.value.email || '—' }}</dd>
 
               <dt class="col-sm-4">Nacimiento</dt>
-              <dd class="col-sm-8">{{ nacimiento || '—' }}</dd>
+              <dd class="col-sm-8">{{ formulario.value.nacimiento || '—' }}</dd>
 
               <dt class="col-sm-4">Dirección</dt>
-              <dd class="col-sm-8">{{ direccion || '—' }}</dd>
+              <dd class="col-sm-8">{{ formulario.value.direccion || '—' }}</dd>
             </dl>
           </div>
 
