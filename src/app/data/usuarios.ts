@@ -14,6 +14,12 @@ import { Usuario } from '../models/usuario';
  * comprobar los privilegios de cada rol.
  */
 export const USUARIOS: Usuario[] = [
-  { nombre: 'Administrador', email: 'admin@mesaludica.cl', password: 'Admin123!',   rol: 'admin' },
-  { nombre: 'Cliente Demo',  email: 'cliente@correo.cl',   password: 'Cliente123!', rol: 'cliente' }
+  {
+    nombre: 'Administrador', usuario: 'admin', email: 'admin@mesaludica.cl',
+    password: 'Admin123!', telefono: '900000000', direccion: 'Oficina central', rol: 'admin'
+  },
+  {
+    nombre: 'Cliente Demo', usuario: 'clientedemo', email: 'cliente@correo.cl',
+    password: 'Cliente123!', telefono: '912345678', direccion: 'Av. Siempre Viva 742', rol: 'cliente'
+  }
 ];

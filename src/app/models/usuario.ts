@@ -18,10 +18,16 @@ export type Rol = 'cliente' | 'admin';
 export interface Usuario {
   /** Nombre visible del usuario. */
   nombre: string;
+  /** Nombre de usuario (opcional). */
+  usuario?: string;
   /** Correo usado para iniciar sesión. */
   email: string;
   /** Contraseña (solo demostración, sin backend). */
   password: string;
+  /** Teléfono de contacto (opcional). */
+  telefono?: string;
+  /** Dirección de despacho (opcional). */
+  direccion?: string;
   /** Rol que define sus privilegios. */
   rol: Rol;
 }

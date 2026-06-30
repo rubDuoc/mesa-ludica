@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { fuerzaContrasena, edadMinima, contrasenasIguales } from '../../validators/registro.validators';
+import { AuthService } from '../../services/auth.service';
 
 /**
  * @description
@@ -15,7 +17,7 @@ import { fuerzaContrasena, edadMinima, contrasenasIguales } from '../../validato
  */
 @Component({
   selector: 'app-registro',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './registro.html',
   styleUrl: './registro.scss'
 })
@@ -32,10 +34,19 @@ export class Registro {
   /** Controla si la confirmación de contraseña se muestra en texto plano. */
   verConfirmar = false;
 
+  /** Indica que el correo ingresado ya está registrado. */
+  emailExistente = false;
+
   /**
    * @param fb Constructor de formularios reactivos de Angular.
+   * @param auth Servicio de autenticación (registro e inicio de sesión).
+   * @param router Router para redirigir tras un registro exitoso.
    */
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+    private router: Router
+  ) {
     this.formulario = this.fb.group({
       nombre:              ['', [Validators.required, Validators.minLength(3)]],
       usuario:             ['', [Validators.required, Validators.minLength(4)]],
@@ -66,16 +77,30 @@ export class Registro {
   }
 
   /**
-   * Maneja el envío del formulario. Si es inválido, marca los campos como
-   * tocados para mostrar todos los mensajes de error. Si es válido, en la
-   * Experiencia 3 enviaría los datos a la API REST.
+   * Maneja el envío del formulario. Si es inválido, muestra los errores. Si el
+   * correo ya existe, lo avisa. Si todo está correcto, crea la cuenta (rol
+   * cliente), inicia sesión automáticamente y redirige al inicio.
    */
   enviar(): void {
     this.enviado = true;
+    this.emailExistente = false;
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
       return;
     }
+    const v = this.formulario.value;
+    if (this.auth.emailRegistrado(v.email)) {
+      this.emailExistente = true;
+      return;
+    }
+    this.auth.registrar({
+      nombre: v.nombre,
+      usuario: v.usuario,
+      email: v.email,
+      password: v.contrasena,
+      direccion: v.direccion
+    });
+    this.router.navigate(['/inicio']);
   }
 
   /** Reinicia el formulario a su estado inicial y oculta los errores. */

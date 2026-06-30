@@ -91,6 +91,8 @@ src/app/
   roles de distinto privilegio: **cliente** y **admin**. El menú del header se adapta
   a la sesión y los *guards* (`authGuard`, `adminGuard`) protegen `/perfil` y `/admin`.
   Cuentas de prueba: `admin@mesaludica.cl / Admin123!` y `cliente@correo.cl / Cliente123!`.
+  Al **registrarse** se crea una cuenta de **cliente** y la sesión queda iniciada al instante
+  (los usuarios viven en memoria; se reinician al recargar, hasta integrar la API en Exp3).
 - **Pruebas unitarias (Jasmine + Karma):** se corren con `ng test`. Cubren:
   - `registro.spec.ts` — validaciones del formulario de registro.
   - `login.spec.ts` / `perfil.spec.ts` — login (credenciales) y perfil (precarga, teléfono).

@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
 
 /**
  * @description
  * Página de modificación de perfil. Formulario reactivo precargado con los
- * datos actuales del usuario (simulados) que permite editarlos con validaciones.
+ * datos del usuario que tiene la sesión iniciada, que permite editarlos con
+ * validaciones y guardarlos en la sesión.
  */
 @Component({
   selector: 'app-perfil',
@@ -14,6 +16,17 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
   styleUrl: './perfil.scss'
 })
 export class Perfil {
+  private readonly auth = inject(AuthService);
+
+  /** Datos actuales del usuario logueado, usados para precargar y restablecer. */
+  private readonly datosActuales = {
+    nombre: this.auth.usuario()?.nombre ?? '',
+    usuario: this.auth.usuario()?.usuario ?? '',
+    email: this.auth.usuario()?.email ?? '',
+    telefono: this.auth.usuario()?.telefono ?? '',
+    direccion: this.auth.usuario()?.direccion ?? ''
+  };
+
   /** Formulario reactivo con los datos editables del perfil. */
   formulario: FormGroup;
 
@@ -22,15 +35,6 @@ export class Perfil {
 
   /** Indica que los cambios pasaron la validación (mensaje de éxito). */
   guardado = false;
-
-  /** Datos actuales del usuario (simulados), usados para precargar el formulario. */
-  private readonly datosActuales = {
-    nombre: 'Rubén Oyarzún',
-    usuario: 'ruben',
-    email: 'ruben@correo.cl',
-    telefono: '912345678',
-    direccion: 'Av. Siempre Viva 742'
-  };
 
   /**
    * @param fb Constructor de formularios reactivos de Angular.
@@ -56,7 +60,7 @@ export class Perfil {
 
   /**
    * Guarda los cambios del perfil. Si el formulario es inválido muestra los
-   * errores; si es válido, simula el guardado.
+   * errores; si es válido, actualiza los datos del usuario en la sesión.
    */
   guardar(): void {
     this.enviado = true;
@@ -65,6 +69,14 @@ export class Perfil {
       this.formulario.markAllAsTouched();
       return;
     }
+    const v = this.formulario.value;
+    this.auth.actualizarPerfil({
+      nombre: v.nombre,
+      usuario: v.usuario,
+      email: v.email,
+      telefono: v.telefono,
+      direccion: v.direccion
+    });
     this.guardado = true;
   }
 

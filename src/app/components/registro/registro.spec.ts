@@ -1,17 +1,39 @@
 import { TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
+import { provideRouter, Router } from '@angular/router';
 import { Registro } from './registro';
+import { AuthService } from '../../services/auth.service';
+
+/** Devuelve datos válidos de registro, con el correo que se indique. */
+function datosValidos(email: string) {
+  const hoy = new Date();
+  const hace20 = new Date(hoy.getFullYear() - 20, hoy.getMonth(), hoy.getDate());
+  return {
+    nombre: 'Persona Prueba',
+    usuario: 'prueba',
+    email,
+    contrasena: 'Clave123!',
+    confirmarContrasena: 'Clave123!',
+    nacimiento: hace20.toISOString().substring(0, 10),
+    direccion: ''
+  };
+}
 
 describe('Registro (formulario reactivo)', () => {
   let component: Registro;
+  let auth: AuthService;
+  let router: Router;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Registro, ReactiveFormsModule]
+      imports: [Registro, ReactiveFormsModule],
+      providers: [provideRouter([])]
     }).compileComponents();
 
     const fixture = TestBed.createComponent(Registro);
     component = fixture.componentInstance;
+    auth = TestBed.inject(AuthService);
+    router = TestBed.inject(Router);
     fixture.detectChanges();
   });
 
@@ -60,17 +82,24 @@ describe('Registro (formulario reactivo)', () => {
   });
 
   it('acepta el formulario cuando todos los datos son válidos', () => {
-    const hoy = new Date();
-    const hace20 = new Date(hoy.getFullYear() - 20, hoy.getMonth(), hoy.getDate());
-    component.formulario.setValue({
-      nombre: 'Rubén Oyarzún',
-      usuario: 'ruben',
-      email: 'ruben@correo.cl',
-      contrasena: 'Clave123!',
-      confirmarContrasena: 'Clave123!',
-      nacimiento: hace20.toISOString().substring(0, 10),
-      direccion: ''  // opcional, puede ir vacío
-    });
+    component.formulario.setValue(datosValidos('ruben@correo.cl'));
     expect(component.formulario.valid).toBeTrue();
+  });
+
+  it('registra un correo nuevo, inicia sesión y redirige al inicio', () => {
+    const navegar = spyOn(router, 'navigate');
+    component.formulario.setValue(datosValidos('nuevo@correo.cl'));
+    component.enviar();
+    expect(component.emailExistente).toBeFalse();
+    expect(auth.estaAutenticado()).toBeTrue();
+    expect(navegar).toHaveBeenCalledWith(['/inicio']);
+  });
+
+  it('avisa si el correo ya está registrado y no crea sesión', () => {
+    spyOn(router, 'navigate');
+    component.formulario.setValue(datosValidos('cliente@correo.cl')); // cuenta demo existente
+    component.enviar();
+    expect(component.emailExistente).toBeTrue();
+    expect(auth.estaAutenticado()).toBeFalse();
   });
 });
