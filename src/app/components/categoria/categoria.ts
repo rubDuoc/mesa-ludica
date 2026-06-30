@@ -15,7 +15,7 @@ import { Producto } from '../../models/producto';
   templateUrl: './categoria.html',
   styleUrl: './categoria.scss'
 })
-export class Categoria implements OnInit {
+export class CategoriaPage implements OnInit {
   /** Identificador de la categoría actual (desde la URL). */
   slug = '';
   /** Título del banner de la categoría. */

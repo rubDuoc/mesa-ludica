@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { Inicio } from './components/inicio/inicio';
-import { Categoria } from './components/categoria/categoria';
+import { CategoriaPage } from './components/categoria/categoria';
 import { Detalle } from './components/detalle/detalle';
 import { Registro } from './components/registro/registro';
 import { Login } from './components/login/login';
@@ -20,7 +20,7 @@ import { authGuard, adminGuard } from './guards/auth.guard';
  */
 export const routes: Routes = [
   { path: 'inicio',            component: Inicio },
-  { path: 'categoria/:nombre', component: Categoria },
+  { path: 'categoria/:nombre', component: CategoriaPage },
   { path: 'detalle/:id',       component: Detalle },
   { path: 'registro',          component: Registro },
   { path: 'login',             component: Login },
