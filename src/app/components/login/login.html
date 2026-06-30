@@ -1,0 +1,77 @@
+<section class="banner-registro">
+  <h1>Iniciar sesión</h1>
+  <p>Ingresa con tu cuenta para administrar tus compras y tu perfil.</p>
+</section>
+
+<main>
+  <section class="seccion">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+
+          <div class="formulario-card">
+            <h2 class="h4 mb-1">Acceso</h2>
+            <p class="text-muted mb-4">Completa tus credenciales para ingresar.</p>
+
+            <form [formGroup]="formulario" (ngSubmit)="iniciarSesion()" novalidate>
+
+              <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="email" formControlName="email"
+                       [class.is-invalid]="email.invalid && (email.touched || enviado)">
+                <small class="text-danger" *ngIf="email.errors?.['required'] && (email.touched || enviado)">
+                  El correo es obligatorio.
+                </small>
+                <small class="text-danger" *ngIf="email.errors?.['email'] && (email.touched || enviado)">
+                  Ingresa un correo con formato válido.
+                </small>
+              </div>
+
+              <div class="mb-3">
+                <label for="contrasena" class="form-label">Contraseña</label>
+                <div class="input-group">
+                  <input [type]="verContrasena ? 'text' : 'password'" class="form-control" id="contrasena" formControlName="contrasena"
+                         [class.is-invalid]="contrasena.invalid && (contrasena.touched || enviado)">
+                  <button type="button" class="btn btn-outline-secondary" tabindex="-1"
+                          (click)="verContrasena = !verContrasena"
+                          [attr.aria-label]="verContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                    {{ verContrasena ? '🙈' : '👁️' }}
+                  </button>
+                </div>
+                <small class="text-danger" *ngIf="contrasena.errors?.['required'] && (contrasena.touched || enviado)">
+                  La contraseña es obligatoria.
+                </small>
+              </div>
+
+              <!-- Mensaje de error si las credenciales no coinciden (*ngIf) -->
+              <div class="alert alert-danger" *ngIf="credencialesInvalidas">
+                ✖ Correo o contraseña incorrectos.
+              </div>
+
+              <div class="d-flex flex-wrap gap-2 mt-3">
+                <button type="submit" class="boton">Iniciar sesión</button>
+                <button type="button" class="boton boton-secundario" (click)="limpiar()">Limpiar</button>
+              </div>
+            </form>
+
+            <hr class="my-4">
+            <p class="mb-1">
+              <a routerLink="/recuperar">¿Olvidaste tu contraseña?</a>
+            </p>
+            <p class="mb-3 text-muted">
+              ¿No tienes cuenta? <a routerLink="/registro">Regístrate aquí</a>
+            </p>
+
+            <!-- Cuentas de demostración para probar los roles -->
+            <div class="alert alert-info mb-0">
+              <strong>Cuentas de prueba:</strong><br>
+              Admin → <code>admin&#64;mesaludica.cl</code> / <code>Admin123!</code><br>
+              Cliente → <code>cliente&#64;correo.cl</code> / <code>Cliente123!</code>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

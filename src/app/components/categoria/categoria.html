@@ -21,7 +21,7 @@
             <!-- *ngIf: la etiqueta de descuento solo aparece si hay oferta -->
             <span class="etiqueta-descuento" *ngIf="descuento(p) > 0">-{{ descuento(p) }}%</span>
 
-            <img [src]="'/' + p.imagen" [alt]="'Juego ' + p.nombre">
+            <img [src]="urlImagen(p.imagen)" [alt]="'Juego ' + p.nombre">
             <div class="cuerpo">
               <h3>{{ p.nombre }}</h3>
               <p class="descripcion">{{ p.descripcion }}</p>

@@ -1,0 +1,39 @@
+/* Estilos propios del componente Admin (el diseño base está en styles.scss global) */
+
+/* Zona de arrastre / carga de imagen */
+.dropzone {
+  border: 2px dashed #c2c2cc;
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.dropzone:hover {
+  background: #f6f6f9;
+}
+
+.dropzone.dragover {
+  background: #eef2ff;
+  border-color: #4f46e5;
+}
+
+.dropzone.dropzone-invalida {
+  border-color: #dc3545;
+}
+
+.dropzone-preview {
+  max-height: 120px;
+  max-width: 100%;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+/* Miniatura del producto en la tabla de inventario */
+.miniatura {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 6px;
+}

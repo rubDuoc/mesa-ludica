@@ -12,17 +12,49 @@
     <div class="collapse navbar-collapse" id="navMenu">
       <ul class="navbar-nav ms-auto align-items-lg-center menu">
         <li class="nav-item"><a class="nav-link" routerLink="/inicio" routerLinkActive="active">Inicio</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/categoria/estrategia" routerLinkActive="active">Estrategia</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/categoria/familiares" routerLinkActive="active">Familiares</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/categoria/fiesta" routerLinkActive="active">Fiesta</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/categoria/cartas" routerLinkActive="active">Cartas</a></li>
-        <li class="nav-item ms-lg-2"><a class="nav-link nav-cta" routerLink="/registro" routerLinkActive="active">Registrarse</a></li>
-        <li class="nav-item ms-lg-3">
-          <!-- Contador del carrito: el badge aparece solo cuando hay productos (*ngIf) -->
-          <span class="nav-link carrito-indicador" title="Productos en el carrito">
+
+        <!-- Catálogo: visible para visitantes y clientes, NO para el admin -->
+        <ng-container *ngIf="!auth.esAdmin()">
+          <li class="nav-item"><a class="nav-link" routerLink="/categoria/estrategia" routerLinkActive="active">Estrategia</a></li>
+          <li class="nav-item"><a class="nav-link" routerLink="/categoria/familiares" routerLinkActive="active">Familiares</a></li>
+          <li class="nav-item"><a class="nav-link" routerLink="/categoria/fiesta" routerLinkActive="active">Fiesta</a></li>
+          <li class="nav-item"><a class="nav-link" routerLink="/categoria/cartas" routerLinkActive="active">Cartas</a></li>
+        </ng-container>
+
+        <!-- Solo administradores: acceso al panel de administración -->
+        <li class="nav-item" *ngIf="auth.esAdmin()">
+          <a class="nav-link" routerLink="/admin" routerLinkActive="active">Administración</a>
+        </li>
+
+        <!-- Visitante sin sesión: iniciar sesión / registrarse -->
+        <ng-container *ngIf="!auth.estaAutenticado()">
+          <li class="nav-item ms-lg-2"><a class="nav-link" routerLink="/login" routerLinkActive="active">Iniciar sesión</a></li>
+          <li class="nav-item ms-lg-2"><a class="nav-link nav-cta" routerLink="/registro" routerLinkActive="active">Registrarse</a></li>
+        </ng-container>
+
+        <!-- Cliente con sesión: sus compras y su perfil (no aplica al admin) -->
+        <ng-container *ngIf="auth.estaAutenticado() && !auth.esAdmin()">
+          <li class="nav-item"><a class="nav-link" routerLink="/mis-compras" routerLinkActive="active">Mis compras</a></li>
+          <li class="nav-item"><a class="nav-link" routerLink="/perfil" routerLinkActive="active">Mi perfil</a></li>
+        </ng-container>
+
+        <!-- Cualquier usuario con sesión: saludo y cerrar sesión -->
+        <ng-container *ngIf="auth.estaAutenticado()">
+          <li class="nav-item ms-lg-2">
+            <span class="nav-link saludo-usuario">Hola, {{ auth.usuario()?.nombre }}</span>
+          </li>
+          <li class="nav-item ms-lg-2">
+            <button type="button" class="nav-link boton-cerrar" (click)="cerrarSesion()">Cerrar sesión</button>
+          </li>
+        </ng-container>
+
+        <!-- Carrito: visible para visitantes y clientes, NO para el admin -->
+        <li class="nav-item ms-lg-3" *ngIf="!auth.esAdmin()">
+          <!-- Carrito clickeable: lleva a /carrito; el badge aparece solo si hay productos (*ngIf) -->
+          <a class="nav-link carrito-indicador" routerLink="/carrito" routerLinkActive="active" title="Ver carrito">
             🛒
             <span class="carrito-badge" *ngIf="carrito.totalItems() > 0">{{ carrito.totalItems() }}</span>
-          </span>
+          </a>
         </li>
       </ul>
     </div>

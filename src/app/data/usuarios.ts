@@ -1,0 +1,19 @@
+/* ============================================================
+   Mesa Lúdica - Usuarios de demostración
+   DSY2202 - Experiencia 2, Semana 6
+
+   Cuentas simuladas para probar los dos roles. En la Experiencia 3
+   estos datos vendrán de una API REST.
+   ============================================================ */
+
+import { Usuario } from '../models/usuario';
+
+/**
+ * @description
+ * Usuarios de demostración con sus roles. Sirven para iniciar sesión y
+ * comprobar los privilegios de cada rol.
+ */
+export const USUARIOS: Usuario[] = [
+  { nombre: 'Administrador', email: 'admin@mesaludica.cl', password: 'Admin123!',   rol: 'admin' },
+  { nombre: 'Cliente Demo',  email: 'cliente@correo.cl',   password: 'Cliente123!', rol: 'cliente' }
+];

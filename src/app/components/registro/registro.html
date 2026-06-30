@@ -58,8 +58,15 @@
               <!-- Contraseña -->
               <div class="mb-3">
                 <label for="contrasena" class="form-label">Contraseña</label>
-                <input type="password" class="form-control" id="contrasena" formControlName="contrasena"
-                       [class.is-invalid]="contrasena.invalid && (contrasena.touched || enviado)">
+                <div class="input-group">
+                  <input [type]="verContrasena ? 'text' : 'password'" class="form-control" id="contrasena" formControlName="contrasena"
+                         [class.is-invalid]="contrasena.invalid && (contrasena.touched || enviado)">
+                  <button type="button" class="btn btn-outline-secondary" tabindex="-1"
+                          (click)="verContrasena = !verContrasena"
+                          [attr.aria-label]="verContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                    {{ verContrasena ? '🙈' : '👁️' }}
+                  </button>
+                </div>
                 <small class="text-danger" *ngIf="contrasena.errors?.['required'] && (contrasena.touched || enviado)">
                   La contraseña es obligatoria.
                 </small>
@@ -67,15 +74,22 @@
                   La contraseña debe tener entre 6 y 18 caracteres.
                 </small>
                 <small class="text-danger" *ngIf="contrasena.errors?.['fuerza'] && (contrasena.touched || enviado)">
-                  La contraseña debe incluir al menos un número y una mayúscula.
+                  La contraseña debe incluir al menos un número, una mayúscula y un carácter especial.
                 </small>
               </div>
 
               <!-- Repetir contraseña -->
               <div class="mb-3">
                 <label for="confirmarContrasena" class="form-label">Repetir contraseña</label>
-                <input type="password" class="form-control" id="confirmarContrasena" formControlName="confirmarContrasena"
-                       [class.is-invalid]="(confirmarContrasena.invalid || formulario.errors?.['contrasenasDistintas']) && (confirmarContrasena.touched || enviado)">
+                <div class="input-group">
+                  <input [type]="verConfirmar ? 'text' : 'password'" class="form-control" id="confirmarContrasena" formControlName="confirmarContrasena"
+                         [class.is-invalid]="(confirmarContrasena.invalid || formulario.errors?.['contrasenasDistintas']) && (confirmarContrasena.touched || enviado)">
+                  <button type="button" class="btn btn-outline-secondary" tabindex="-1"
+                          (click)="verConfirmar = !verConfirmar"
+                          [attr.aria-label]="verConfirmar ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                    {{ verConfirmar ? '🙈' : '👁️' }}
+                  </button>
+                </div>
                 <small class="text-danger" *ngIf="confirmarContrasena.errors?.['required'] && (confirmarContrasena.touched || enviado)">
                   Debes repetir la contraseña.
                 </small>
@@ -107,7 +121,7 @@
 
               <!-- Mensaje de éxito cuando el formulario es válido (*ngIf) -->
               <div class="alert alert-success" *ngIf="enviado && formulario.valid">
-                ✔ ¡Registro válido! (demostración, sin envío real todavía).
+                ✔ ¡Registro válido!
               </div>
 
               <div class="d-flex flex-wrap gap-2 mt-3">

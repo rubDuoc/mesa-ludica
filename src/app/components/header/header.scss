@@ -1,10 +1,26 @@
+/* Saludo al usuario con sesión iniciada */
+.saludo-usuario {
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* Botón "Cerrar sesión" con apariencia de enlace del menú */
+.boton-cerrar {
+  background: none;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
 /* Indicador del carrito en la navbar */
 .carrito-indicador {
   position: relative;
   display: inline-flex;
   align-items: center;
   font-size: 1.2rem;
-  cursor: default;
+  cursor: pointer;
 }
 
 .carrito-badge {

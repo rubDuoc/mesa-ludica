@@ -38,9 +38,25 @@ describe('Registro (formulario reactivo)', () => {
     expect(component.nacimiento.errors?.['menorDeEdad']).toBeTrue();
   });
 
-  it('rechaza una contraseña sin número ni mayúscula', () => {
+  it('rechaza una contraseña sin número, mayúscula ni carácter especial', () => {
     component.contrasena.setValue('claveinsegura');
     expect(component.contrasena.errors?.['fuerza']).toBeTrue();
+  });
+
+  it('marca el correo como inválido cuando el formato es incorrecto', () => {
+    component.email.setValue('correo-sin-arroba');
+    expect(component.email.errors?.['email']).toBeTrue();
+  });
+
+  it('limpiar() vacía el formulario y reinicia el estado de enviado', () => {
+    component.formulario.patchValue({ nombre: 'Prueba', email: 'a@b.cl' });
+    component.enviado = true;
+
+    component.limpiar();
+
+    expect(component.formulario.value.nombre).toBeNull();
+    expect(component.formulario.value.email).toBeNull();
+    expect(component.enviado).toBeFalse();
   });
 
   it('acepta el formulario cuando todos los datos son válidos', () => {
@@ -50,8 +66,8 @@ describe('Registro (formulario reactivo)', () => {
       nombre: 'Rubén Oyarzún',
       usuario: 'ruben',
       email: 'ruben@correo.cl',
-      contrasena: 'Clave123',
-      confirmarContrasena: 'Clave123',
+      contrasena: 'Clave123!',
+      confirmarContrasena: 'Clave123!',
       nacimiento: hace20.toISOString().substring(0, 10),
       direccion: ''  // opcional, puede ir vacío
     });

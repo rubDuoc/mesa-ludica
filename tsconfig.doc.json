@@ -1,0 +1,11 @@
+/* Configuración usada por Compodoc para generar la documentación del FrontEnd.
+   Incluye todo el código fuente y excluye los archivos de pruebas (.spec.ts). */
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts"
+  ]
+}

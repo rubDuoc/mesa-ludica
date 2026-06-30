@@ -10,7 +10,10 @@
 
 import { Producto, Categoria } from '../models/producto';
 
-/* Las 4 categorías que se muestran en la página de inicio */
+/**
+ * @description
+ * Las 4 categorías que se muestran en la página de inicio.
+ */
 export const CATEGORIAS: Categoria[] = [
   { slug: 'estrategia', nombre: 'Estrategia', descripcion: 'Juegos que ponen a prueba tu mente y tus tácticas.', imagen: 'img/cat-estrategia.svg' },
   { slug: 'familiares', nombre: 'Familiares', descripcion: 'Diversión para compartir con toda la familia.',     imagen: 'img/cat-familiares.svg' },
@@ -18,7 +21,11 @@ export const CATEGORIAS: Categoria[] = [
   { slug: 'cartas',     nombre: 'Cartas',     descripcion: 'Juegos rápidos y portátiles para cualquier lugar.', imagen: 'img/cat-cartas.svg' }
 ];
 
-/* Texto del banner que encabeza cada página de categoría */
+/**
+ * @description
+ * Texto del banner (título y bajada) que encabeza cada página de categoría,
+ * indexado por el slug de la categoría.
+ */
 export const BANNERS: Record<string, { titulo: string; bajada: string }> = {
   estrategia: { titulo: 'Estrategia', bajada: 'Domina el tablero con ingenio y planificación.' },
   familiares: { titulo: 'Familiares', bajada: 'Diversión para compartir con toda la familia.' },
@@ -26,7 +33,10 @@ export const BANNERS: Record<string, { titulo: string; bajada: string }> = {
   cartas:     { titulo: 'Cartas',     bajada: 'Mazos clásicos y modernos para jugar donde quieras.' }
 };
 
-/* Los 12 juegos del catálogo */
+/**
+ * @description
+ * Catálogo completo: los 12 juegos de mesa disponibles.
+ */
 export const PRODUCTOS: Producto[] = [
   // Estrategia
   { id: 'p-001', nombre: 'Catan',                     categoria: 'estrategia', precio: 31990, precio_antiguo: 39990, stock: 12, imagen: 'img/CATAN.jpg',           descripcion: 'Construye, comercia y coloniza la isla de Catan en este clásico de la estrategia.' },

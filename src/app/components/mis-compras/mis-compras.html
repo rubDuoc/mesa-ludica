@@ -1,0 +1,39 @@
+<section class="banner-registro">
+  <h1>Mis compras</h1>
+  <p>Historial de tus compras realizadas.</p>
+</section>
+
+<main>
+  <section class="seccion">
+    <div class="container">
+
+      <!-- Sin compras (*ngIf con else) -->
+      <div class="text-center py-5" *ngIf="misCompras.length === 0; else listado">
+        <h2 class="h4">Todavía no tienes compras</h2>
+        <p class="text-muted">Cuando completes un pago, aparecerá aquí.</p>
+        <a class="boton" routerLink="/inicio">Ir al catálogo</a>
+      </div>
+
+      <ng-template #listado>
+        <!-- *ngFor: una tarjeta por compra -->
+        <div class="formulario-card mb-3" *ngFor="let compra of misCompras">
+          <div class="d-flex justify-content-between flex-wrap mb-2">
+            <strong>Compra #{{ compra.id }}</strong>
+            <span class="text-muted">{{ compra.fecha | date:'dd-MM-yyyy HH:mm' }}</span>
+          </div>
+          <ul class="list-unstyled mb-2">
+            <li class="d-flex justify-content-between" *ngFor="let item of compra.items">
+              <span>{{ item.cantidad }} × {{ item.producto.nombre }}</span>
+              <span>{{ formatearPrecio(item.producto.precio * item.cantidad) }}</span>
+            </li>
+          </ul>
+          <div class="d-flex justify-content-between border-top pt-2">
+            <strong>Total</strong>
+            <strong>{{ formatearPrecio(compra.total) }}</strong>
+          </div>
+        </div>
+      </ng-template>
+
+    </div>
+  </section>
+</main>

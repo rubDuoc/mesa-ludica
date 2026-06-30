@@ -6,7 +6,7 @@
       <div class="detalle-producto" *ngIf="producto">
         <div class="row g-0">
           <div class="col-12 col-md-5">
-            <img [src]="'/' + producto.imagen" [alt]="'Juego ' + producto.nombre">
+            <img [src]="urlImagen(producto.imagen)" [alt]="'Juego ' + producto.nombre">
           </div>
           <div class="col-12 col-md-7">
             <div class="detalle-cuerpo">

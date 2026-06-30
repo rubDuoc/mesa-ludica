@@ -3,6 +3,16 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { fuerzaContrasena, edadMinima, contrasenasIguales } from '../../validators/registro.validators';
 
+/**
+ * @description
+ * Página de registro de usuarios. Implementa un formulario reactivo con
+ * validaciones definidas en TypeScript (campos obligatorios, formato de correo,
+ * fuerza y coincidencia de contraseñas, y edad mínima).
+ *
+ * @usageNotes
+ * Los validadores personalizados viven en `validators/registro.validators.ts`
+ * para poder reutilizarse en otros formularios y probarse por separado.
+ */
 @Component({
   selector: 'app-registro',
   imports: [CommonModule, ReactiveFormsModule],
@@ -10,13 +20,21 @@ import { fuerzaContrasena, edadMinima, contrasenasIguales } from '../../validato
   styleUrl: './registro.scss'
 })
 export class Registro {
-  // Formulario reactivo: estructura y validaciones definidas en TypeScript.
+  /** Formulario reactivo con la estructura y validaciones del registro. */
   formulario: FormGroup;
 
-  // Se pone en true al intentar enviar, para mostrar los errores aunque el
-  // usuario no haya tocado los campos.
+  /** Se pone en true al intentar enviar, para forzar el despliegue de errores. */
   enviado = false;
 
+  /** Controla si la contraseña se muestra en texto plano (botón del ojo). */
+  verContrasena = false;
+
+  /** Controla si la confirmación de contraseña se muestra en texto plano. */
+  verConfirmar = false;
+
+  /**
+   * @param fb Constructor de formularios reactivos de Angular.
+   */
   constructor(private fb: FormBuilder) {
     this.formulario = this.fb.group({
       nombre:              ['', [Validators.required, Validators.minLength(3)]],
@@ -38,22 +56,29 @@ export class Registro {
   get nacimiento()          { return this.formulario.get('nacimiento')!; }
   get direccion()           { return this.formulario.get('direccion')!; }
 
-  // La vista previa aparece cuando hay algún dato escrito.
+  /**
+   * Indica si mostrar la vista previa (hay al menos un dato escrito).
+   * @returns true si nombre, usuario o correo tienen contenido.
+   */
   get tieneDatos(): boolean {
     const v = this.formulario.value;
     return !!(v.nombre || v.usuario || v.email);
   }
 
+  /**
+   * Maneja el envío del formulario. Si es inválido, marca los campos como
+   * tocados para mostrar todos los mensajes de error. Si es válido, en la
+   * Experiencia 3 enviaría los datos a la API REST.
+   */
   enviar(): void {
     this.enviado = true;
     if (this.formulario.invalid) {
-      // Marca todo como "tocado" para que se muestren todos los mensajes.
       this.formulario.markAllAsTouched();
       return;
     }
-    // En la Experiencia 3 estos datos se enviarían a la API REST.
   }
 
+  /** Reinicia el formulario a su estado inicial y oculta los errores. */
   limpiar(): void {
     this.formulario.reset();
     this.enviado = false;

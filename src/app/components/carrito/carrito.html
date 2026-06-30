@@ -1,0 +1,70 @@
+<section class="banner-registro">
+  <h1>Tu carrito</h1>
+  <p>Revisa tus juegos antes de pagar.</p>
+</section>
+
+<main>
+  <section class="seccion">
+    <div class="container">
+
+      <!-- Carrito vacío (*ngIf con else) -->
+      <div class="text-center py-5" *ngIf="carrito.contenido().length === 0; else conItems">
+        <h2 class="h4">Tu carrito está vacío</h2>
+        <p class="text-muted">Agrega algunos juegos desde el catálogo.</p>
+        <a class="boton" routerLink="/inicio">Ir al catálogo</a>
+      </div>
+
+      <ng-template #conItems>
+        <div class="row g-4">
+          <div class="col-12 col-lg-8">
+            <!-- *ngFor: una fila por producto del carrito -->
+            <div class="formulario-card mb-3" *ngFor="let item of carrito.contenido()">
+              <div class="row align-items-center g-3">
+                <div class="col-4 col-md-2">
+                  <img [src]="urlImagen(item.producto.imagen)" [alt]="item.producto.nombre" class="img-fluid rounded">
+                </div>
+                <div class="col-8 col-md-4">
+                  <h3 class="h6 mb-1">{{ item.producto.nombre }}</h3>
+                  <p class="text-muted mb-0">{{ formatearPrecio(item.producto.precio) }} c/u</p>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="boton boton-secundario" (click)="carrito.decrementar(item.producto.id)">−</button>
+                    <span class="fw-bold">{{ item.cantidad }}</span>
+                    <button type="button" class="boton boton-secundario" (click)="carrito.incrementar(item.producto.id)">+</button>
+                  </div>
+                </div>
+                <div class="col-4 col-md-2 text-end fw-bold">
+                  {{ formatearPrecio(item.producto.precio * item.cantidad) }}
+                </div>
+                <div class="col-2 col-md-1 text-end">
+                  <button type="button" class="boton-quitar" title="Quitar" (click)="carrito.quitar(item.producto.id)">🗑</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumen -->
+          <div class="col-12 col-lg-4">
+            <div class="formulario-card">
+              <h3 class="h5 mb-3">Resumen</h3>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Productos</span>
+                <span>{{ carrito.totalItems() }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-3">
+                <strong>Total</strong>
+                <strong>{{ formatearPrecio(carrito.total()) }}</strong>
+              </div>
+              <div class="d-grid gap-2">
+                <a class="boton" routerLink="/pago">Pagar</a>
+                <button type="button" class="boton boton-secundario" (click)="carrito.vaciar()">Vaciar carrito</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+    </div>
+  </section>
+</main>

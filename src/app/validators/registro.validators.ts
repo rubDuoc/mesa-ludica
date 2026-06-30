@@ -9,8 +9,14 @@
 
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
-/* La contraseña debe incluir al menos un número y al menos una mayúscula.
-   El largo (6-18) se valida aparte con Validators.minLength/maxLength. */
+/**
+ * @description
+ * Valida la fuerza de la contraseña: debe incluir al menos un número, una
+ * mayúscula y un carácter especial. El largo (6-18) se valida aparte con
+ * Validators.minLength/maxLength.
+ * @param control Control del campo contraseña.
+ * @returns `{ fuerza: true }` si no cumple, o `null` si es válida.
+ */
 export function fuerzaContrasena(control: AbstractControl): ValidationErrors | null {
   const valor: string = control.value || '';
   if (!valor) {
@@ -18,10 +24,17 @@ export function fuerzaContrasena(control: AbstractControl): ValidationErrors | n
   }
   const tieneNumero = /[0-9]/.test(valor);
   const tieneMayuscula = /[A-Z]/.test(valor);
-  return tieneNumero && tieneMayuscula ? null : { fuerza: true };
+  const tieneEspecial = /[^A-Za-z0-9]/.test(valor);
+  return tieneNumero && tieneMayuscula && tieneEspecial ? null : { fuerza: true };
 }
 
-/* Exige una edad mínima calculada con la fecha exacta de nacimiento. */
+/**
+ * @description
+ * Crea un validador que exige una edad mínima calculada con la fecha exacta
+ * de nacimiento.
+ * @param minimo Edad mínima requerida en años.
+ * @returns Una función validadora que devuelve `{ menorDeEdad: true }` si no cumple.
+ */
 export function edadMinima(minimo: number): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     if (!control.value) {
@@ -42,8 +55,13 @@ export function edadMinima(minimo: number): ValidatorFn {
   };
 }
 
-/* Las dos contraseñas deben coincidir. Se aplica a nivel de FormGroup
-   porque necesita comparar dos controles entre sí. */
+/**
+ * @description
+ * Valida que las dos contraseñas coincidan. Se aplica a nivel de FormGroup
+ * porque necesita comparar dos controles entre sí (`contrasena` y `confirmarContrasena`).
+ * @param group FormGroup que contiene ambos controles.
+ * @returns `{ contrasenasDistintas: true }` si difieren, o `null` si coinciden.
+ */
 export function contrasenasIguales(group: AbstractControl): ValidationErrors | null {
   const contrasena = group.get('contrasena')?.value;
   const confirmar = group.get('confirmarContrasena')?.value;

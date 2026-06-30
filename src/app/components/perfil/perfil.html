@@ -1,0 +1,89 @@
+<section class="banner-registro">
+  <h1>Mi perfil</h1>
+  <p>Edita tus datos personales y guarda los cambios.</p>
+</section>
+
+<main>
+  <section class="seccion">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+
+          <div class="formulario-card">
+            <h2 class="h4 mb-1">Modificación de perfil</h2>
+            <p class="text-muted mb-4">Los campos vienen precargados con tus datos actuales.</p>
+
+            <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+
+              <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre completo</label>
+                <input type="text" class="form-control" id="nombre" formControlName="nombre"
+                       [class.is-invalid]="nombre.invalid && (nombre.touched || enviado)">
+                <small class="text-danger" *ngIf="nombre.errors?.['required'] && (nombre.touched || enviado)">
+                  El nombre es obligatorio.
+                </small>
+                <small class="text-danger" *ngIf="nombre.errors?.['minlength'] && (nombre.touched || enviado)">
+                  El nombre debe tener al menos 3 caracteres.
+                </small>
+              </div>
+
+              <div class="mb-3">
+                <label for="usuario" class="form-label">Nombre de usuario</label>
+                <input type="text" class="form-control" id="usuario" formControlName="usuario"
+                       [class.is-invalid]="usuario.invalid && (usuario.touched || enviado)">
+                <small class="text-danger" *ngIf="usuario.errors?.['required'] && (usuario.touched || enviado)">
+                  El usuario es obligatorio.
+                </small>
+                <small class="text-danger" *ngIf="usuario.errors?.['minlength'] && (usuario.touched || enviado)">
+                  El usuario debe tener al menos 4 caracteres.
+                </small>
+              </div>
+
+              <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="email" class="form-label">Correo electrónico</label>
+                  <input type="email" class="form-control" id="email" formControlName="email"
+                         [class.is-invalid]="email.invalid && (email.touched || enviado)">
+                  <small class="text-danger" *ngIf="email.errors?.['required'] && (email.touched || enviado)">
+                    El correo es obligatorio.
+                  </small>
+                  <small class="text-danger" *ngIf="email.errors?.['email'] && (email.touched || enviado)">
+                    Ingresa un correo con formato válido.
+                  </small>
+                </div>
+
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="telefono" class="form-label">Teléfono</label>
+                  <input type="text" class="form-control" id="telefono" formControlName="telefono"
+                         [class.is-invalid]="telefono.invalid && (telefono.touched || enviado)">
+                  <small class="text-danger" *ngIf="telefono.errors?.['required'] && (telefono.touched || enviado)">
+                    El teléfono es obligatorio.
+                  </small>
+                  <small class="text-danger" *ngIf="telefono.errors?.['pattern'] && (telefono.touched || enviado)">
+                    Ingresa solo números (8 o 9 dígitos).
+                  </small>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="direccion" class="form-label">Dirección de despacho <span class="text-muted">(opcional)</span></label>
+                <input type="text" class="form-control" id="direccion" formControlName="direccion">
+              </div>
+
+              <!-- Mensaje de éxito (*ngIf) -->
+              <div class="alert alert-success" *ngIf="guardado">
+                ✔ ¡Cambios guardados correctamente!.
+              </div>
+
+              <div class="d-flex flex-wrap gap-2 mt-3">
+                <button type="submit" class="boton">Guardar cambios</button>
+                <button type="button" class="boton boton-secundario" (click)="restablecer()">Restablecer</button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</main>

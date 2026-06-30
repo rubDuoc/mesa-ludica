@@ -1,0 +1,50 @@
+<section class="banner-registro">
+  <h1>Recuperar contraseña</h1>
+  <p>Te enviaremos un enlace para restablecer tu contraseña.</p>
+</section>
+
+<main>
+  <section class="seccion">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+
+          <div class="formulario-card">
+            <h2 class="h4 mb-1">¿Olvidaste tu contraseña?</h2>
+            <p class="text-muted mb-4">Ingresa el correo asociado a tu cuenta.</p>
+
+            <form [formGroup]="formulario" (ngSubmit)="enviarEnlace()" novalidate>
+
+              <div class="mb-3">
+                <label for="email" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="email" formControlName="email"
+                       [class.is-invalid]="email.invalid && (email.touched || enviado)">
+                <small class="text-danger" *ngIf="email.errors?.['required'] && (email.touched || enviado)">
+                  El correo es obligatorio.
+                </small>
+                <small class="text-danger" *ngIf="email.errors?.['email'] && (email.touched || enviado)">
+                  Ingresa un correo con formato válido.
+                </small>
+              </div>
+
+              <!-- Mensaje de éxito (*ngIf) -->
+              <div class="alert alert-success" *ngIf="enlaceEnviado">
+                ✔ Si el correo existe, te enviamos un enlace de recuperación (demostración).
+              </div>
+
+              <div class="d-flex flex-wrap gap-2 mt-3">
+                <button type="submit" class="boton">Enviar enlace</button>
+              </div>
+            </form>
+
+            <hr class="my-4">
+            <p class="mb-0 text-muted">
+              <a routerLink="/login">Volver a iniciar sesión</a>
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
