@@ -21,6 +21,8 @@ export class Detalle implements OnInit {
   producto?: Producto;
   /** Indica si el producto se acaba de agregar al carrito (mensaje de confirmación). */
   agregado = false;
+  /** Indica que no se pudo agregar porque se alcanzó el stock disponible. */
+  stockAlcanzado = false;
 
   /**
    * @param ruta Ruta activa, usada para leer el parámetro `:id`.
@@ -38,6 +40,7 @@ export class Detalle implements OnInit {
     this.ruta.paramMap.subscribe(params => {
       this.producto = this.productoService.getProductoPorId(params.get('id'));
       this.agregado = false;
+      this.stockAlcanzado = false;
     });
   }
 
@@ -67,11 +70,16 @@ export class Detalle implements OnInit {
     return this.productoService.urlImagen(imagen);
   }
 
-  /** Agrega el producto actual al carrito si hay stock y muestra la confirmación. */
+  /**
+   * Agrega el producto actual al carrito. Muestra la confirmación si se agregó,
+   * o el aviso de stock agotado si ya se alcanzó el máximo disponible.
+   */
   agregarAlCarrito(): void {
-    if (this.producto && this.producto.stock > 0) {
-      this.carrito.agregar(this.producto);
-      this.agregado = true;
+    if (!this.producto) {
+      return;
     }
+    const agregado = this.carrito.agregar(this.producto);
+    this.agregado = agregado;
+    this.stockAlcanzado = !agregado;
   }
 }

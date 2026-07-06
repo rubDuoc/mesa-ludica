@@ -18,6 +18,7 @@ describe('CarritoService', () => {
   let service: CarritoService;
 
   beforeEach(() => {
+    localStorage.clear();
     TestBed.configureTestingModule({});
     service = TestBed.inject(CarritoService);
   });
@@ -50,5 +51,20 @@ describe('CarritoService', () => {
     service.agregar(juego);
     service.vaciar();
     expect(service.totalItems()).toBe(0);
+  });
+
+  it('no permite agregar más unidades que el stock disponible', () => {
+    const limitado: Producto = { ...juego, id: 'p-099', stock: 2 };
+    expect(service.agregar(limitado)).toBeTrue();  // 1
+    expect(service.agregar(limitado)).toBeTrue();  // 2
+    expect(service.agregar(limitado)).toBeFalse(); // supera el stock (2)
+    expect(service.totalItems()).toBe(2);
+  });
+
+  it('incrementar no supera el stock disponible', () => {
+    const limitado: Producto = { ...juego, id: 'p-098', stock: 1 };
+    service.agregar(limitado);
+    service.incrementar('p-098');
+    expect(service.totalItems()).toBe(1);
   });
 });

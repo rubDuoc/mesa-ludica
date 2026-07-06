@@ -25,6 +25,7 @@ describe('Registro (formulario reactivo)', () => {
   let router: Router;
 
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [Registro, ReactiveFormsModule],
       providers: [provideRouter([])]

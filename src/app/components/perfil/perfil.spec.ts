@@ -6,6 +6,7 @@ describe('Perfil', () => {
   let component: Perfil;
 
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [Perfil]
     }).compileComponents();

@@ -1,13 +1,18 @@
 /* ============================================================
    Mesa Lúdica - Servicio de compras
-   DSY2202 - Experiencia 2, Semana 6
+   DSY2202 - Experiencia 3, Semana 7
 
    Registra las compras (pagos simulados) para que cada usuario pueda
-   monitorear su historial. En la Experiencia 3 esto irá a una API REST.
+   monitorear su historial. El historial se persiste en localStorage para
+   que no se pierda al recargar la página.
    ============================================================ */
 
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, effect } from '@angular/core';
 import { ItemCarrito } from './carrito.service';
+import { leerStorage, guardarStorage } from './storage.util';
+
+/** Clave de localStorage para el historial de compras. */
+const CLAVE_COMPRAS = 'ml_compras';
 
 /**
  * @description
@@ -32,11 +37,18 @@ export interface Compra {
  */
 @Injectable({ providedIn: 'root' })
 export class ComprasService {
-  /** Historial completo de compras (todos los usuarios). */
-  private readonly historial = signal<Compra[]>([]);
+  /** Historial completo de compras (todos los usuarios), leído de localStorage. */
+  private readonly historial = signal<Compra[]>(leerStorage<Compra[]>(CLAVE_COMPRAS, []));
 
   /** Correlativo para asignar id a cada nueva compra. */
   private siguienteId = 1;
+
+  constructor() {
+    // El id correlativo continúa a partir del mayor id ya guardado.
+    this.siguienteId = this.historial().reduce((max, c) => Math.max(max, c.id), 0) + 1;
+    // Persiste el historial en localStorage cada vez que cambia.
+    effect(() => guardarStorage(CLAVE_COMPRAS, this.historial()));
+  }
 
   /**
    * Registra una nueva compra en el historial.

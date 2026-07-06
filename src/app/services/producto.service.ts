@@ -1,33 +1,84 @@
 /* ============================================================
    Mesa Lúdica - Servicio de productos
-   DSY2202 - Experiencia 2
+   DSY2202 - Experiencia 3, Semana 7
 
-   Centraliza el acceso al catálogo. Mantiene los productos en un signal
-   (inicializado con los datos estáticos) para que el mantenedor del admin
-   pueda agregarlos, editarlos o eliminarlos. En la Experiencia 3 estos
-   métodos pasarán a consumir una API REST con HttpClient.
+   Centraliza el acceso al catálogo. En la Experiencia 3 el catálogo se
+   CONSUME desde un archivo JSON (public/data/productos.json) mediante
+   HttpClient y se vuelca a un signal, de modo que las páginas y el
+   mantenedor del admin siguen trabajando de forma reactiva sobre él.
    ============================================================ */
 
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, firstValueFrom } from 'rxjs';
 import { CATEGORIAS, BANNERS, PRODUCTOS } from '../data/productos';
 import { Producto, Categoria } from '../models/producto';
+import { leerStorage, guardarStorage } from './storage.util';
+
+/** Clave de localStorage donde se guardan los cambios del catálogo (mantenedor). */
+const CLAVE_CATALOGO = 'ml_catalogo';
 
 /**
  * @description
  * Servicio que centraliza el acceso al catálogo de productos y categorías.
- * Los productos viven en un signal para poder administrarlos (CRUD) desde el
- * panel de administración. En la Experiencia 3 pasará a consumir una API REST.
+ * El catálogo se consume desde un archivo JSON con `HttpClient` y se mantiene
+ * en un signal para poder administrarlo (CRUD) desde el panel de administración
+ * y para que las vistas reaccionen a los cambios.
  */
 @Injectable({ providedIn: 'root' })
 export class ProductoService {
-  /** Estado del catálogo, inicializado con los datos estáticos. */
-  private readonly productos = signal<Producto[]>([...PRODUCTOS]);
+  private readonly http = inject(HttpClient);
+
+  /** URL del archivo JSON del catálogo (servido desde la carpeta `public`). */
+  private readonly jsonUrl = '/data/productos.json';
+
+  /** Estado del catálogo. Se llena al consumir el JSON (ver `cargarCatalogo`). */
+  private readonly productos = signal<Producto[]>([]);
 
   /** Catálogo en modo solo lectura (reactivo) para el mantenedor. */
   readonly catalogo = this.productos.asReadonly();
 
   /** Cantidad de productos en el catálogo. */
   readonly totalProductos = computed(() => this.productos().length);
+
+  constructor() {
+    // Persiste los cambios del catálogo (mantenedor) en localStorage.
+    // Se ignora el estado inicial vacío para no pisar lo ya guardado.
+    effect(() => {
+      const lista = this.productos();
+      if (lista.length > 0) {
+        guardarStorage(CLAVE_CATALOGO, lista);
+      }
+    });
+  }
+
+  /**
+   * Deja el catálogo disponible en el signal. Si el mantenedor ya guardó
+   * cambios en `localStorage` usa esos; si no, consume el archivo JSON vía
+   * `HttpClient` (la semilla del catálogo). Se invoca en el arranque de la app
+   * (`provideAppInitializer`) para que las páginas dispongan de los datos desde
+   * el primer render. Si la petición falla, cae en los datos estáticos.
+   * @returns Promesa que se resuelve cuando el catálogo quedó cargado.
+   */
+  cargarCatalogo(): Promise<void> {
+    const guardado = leerStorage<Producto[]>(CLAVE_CATALOGO, []);
+    if (guardado.length > 0) {
+      this.productos.set(guardado);
+      return Promise.resolve();
+    }
+    return firstValueFrom(this.http.get<Producto[]>(this.jsonUrl))
+      .then(data => { this.productos.set(data); })
+      .catch(() => { this.productos.set([...PRODUCTOS]); });
+  }
+
+  /**
+   * Expone el catálogo como `Observable` para que un componente pueda
+   * suscribirse directamente (patrón de consumo de la Experiencia 3).
+   * @returns Observable con el arreglo de productos del JSON.
+   */
+  getProductos(): Observable<Producto[]> {
+    return this.http.get<Producto[]>(this.jsonUrl);
+  }
 
   /**
    * Devuelve todas las categorías que se muestran en la portada.

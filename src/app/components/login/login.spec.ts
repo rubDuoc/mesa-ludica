@@ -7,6 +7,7 @@ describe('Login', () => {
   let router: Router;
 
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [Login],
       providers: [provideRouter([])]

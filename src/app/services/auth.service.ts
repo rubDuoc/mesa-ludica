@@ -1,20 +1,27 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, effect } from '@angular/core';
 import { USUARIOS } from '../data/usuarios';
 import { Usuario } from '../models/usuario';
+import { leerStorage, guardarStorage } from './storage.util';
+
+/** Clave de localStorage para la lista de usuarios registrados. */
+const CLAVE_USUARIOS = 'ml_usuarios';
+/** Clave de localStorage para la sesión activa. */
+const CLAVE_SESION = 'ml_sesion';
 
 /**
  * @description
  * Servicio de autenticación simulada. Mantiene el usuario con sesión iniciada
  * usando signals, de modo que el menú y las páginas reaccionan automáticamente
- * a los cambios de sesión y de rol.
+ * a los cambios de sesión y de rol. Los usuarios registrados y la sesión activa
+ * se persisten en `localStorage`, para que no se pierdan al recargar la página.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   /** Lista de usuarios: parte con los de demostración y crece con los registrados. */
-  private readonly usuarios = signal<Usuario[]>([...USUARIOS]);
+  private readonly usuarios = signal<Usuario[]>(leerStorage(CLAVE_USUARIOS, [...USUARIOS]));
 
   /** Usuario con sesión activa, o null si nadie ha iniciado sesión. */
-  private readonly usuarioActual = signal<Usuario | null>(null);
+  private readonly usuarioActual = signal<Usuario | null>(leerStorage<Usuario | null>(CLAVE_SESION, null));
 
   /** Usuario actual en modo solo lectura. */
   readonly usuario = this.usuarioActual.asReadonly();
@@ -24,6 +31,12 @@ export class AuthService {
 
   /** Indica si el usuario actual tiene rol de administrador. */
   readonly esAdmin = computed(() => this.usuarioActual()?.rol === 'admin');
+
+  constructor() {
+    // Persiste automáticamente en localStorage cada vez que cambian.
+    effect(() => guardarStorage(CLAVE_USUARIOS, this.usuarios()));
+    effect(() => guardarStorage(CLAVE_SESION, this.usuarioActual()));
+  }
 
   /**
    * Valida credenciales contra los usuarios registrados e inicia sesión.

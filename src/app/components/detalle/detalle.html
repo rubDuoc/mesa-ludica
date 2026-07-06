@@ -43,6 +43,10 @@
               <p class="mensaje-carrito mt-3" *ngIf="agregado">
                 ✔ ¡Producto agregado al carrito!
               </p>
+              <!-- Aviso cuando ya se alcanzó el stock disponible (*ngIf) -->
+              <p class="text-danger mt-3" *ngIf="stockAlcanzado">
+                ⚠ Ya tienes el máximo disponible de este producto en el carrito ({{ producto.stock }}).
+              </p>
             </div>
           </div>
         </div>

@@ -5,6 +5,7 @@ describe('AuthService', () => {
   let service: AuthService;
 
   beforeEach(() => {
+    localStorage.clear();
     TestBed.configureTestingModule({});
     service = TestBed.inject(AuthService);
   });
@@ -36,5 +37,24 @@ describe('AuthService', () => {
     service.login('cliente@correo.cl', 'Cliente123!');
     service.logout();
     expect(service.estaAutenticado()).toBeFalse();
+  });
+
+  it('registra un usuario nuevo, queda con sesión y lo recuerda', () => {
+    service.registrar({ nombre: 'Nuevo', email: 'nuevo@correo.cl', password: 'Clave123!' });
+    expect(service.estaAutenticado()).toBeTrue();
+    expect(service.esAdmin()).toBeFalse();
+    expect(service.emailRegistrado('nuevo@correo.cl')).toBeTrue();
+  });
+
+  it('recupera la sesión guardada en localStorage al iniciar', () => {
+    // Simulamos una sesión previamente persistida.
+    localStorage.setItem('ml_sesion', JSON.stringify({
+      nombre: 'Cliente Demo', email: 'cliente@correo.cl', password: 'Cliente123!', rol: 'cliente'
+    }));
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const recreado = TestBed.inject(AuthService);
+    expect(recreado.estaAutenticado()).toBeTrue();
+    expect(recreado.usuario()?.email).toBe('cliente@correo.cl');
   });
 });
