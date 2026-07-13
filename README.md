@@ -1,43 +1,71 @@
 # Mesa Lúdica 🎲 — versión Angular
-**Asignatura:** Desarrollo Full Stack II (DSY2202) — Experiencia 3 (Semana 7)
-**Actividad:** Actividad Formativa 5 — *Integrando APIs externas a nuestro FrontEnd* (consumo de JSON).
-Continúa el proyecto de la Experiencia 2 (Semanas 4 a 6).
+**Asignatura:** Desarrollo Full Stack II (DSY2202) — Experiencia 3 (Semana 8)
+**Actividad:** Sumativa 3 — *Los archivos en las APIs REST* (consumo y manipulación de una
+API REST con los métodos GET/POST/PUT/DELETE, contenerización con Docker y despliegue en Cloud).
+Continúa el proyecto de las Experiencias 2 y 3 (Semanas 4 a 7).
 
-## Resumen de la entrega (pauta S7)
+## Resumen de la entrega (pauta S8)
 | # | Criterio | Dónde está |
 |---|----------|------------|
-| 1 | Git / trabajo colaborativo | Repositorio + Trello |
-| 2 | Archivo **JSON** en formato correcto | `public/data/productos.json` (array JSON con los 12 productos) |
-| 3 | **Servicio** que consume datos desde el JSON | `ProductoService` con `HttpClient`: `cargarCatalogo()` y `getProductos()` |
-
-**Componente nuevo que muestra los datos del JSON:** `/catalogo-api` (se suscribe al `Observable` y arma una tabla con `*ngIf/else #noData`).
+| 1 | Git / trabajo colaborativo + **despliegue en Cloud** | Repositorio + Trello + **Play with Docker** (`Dockerfile` + `nginx.conf`) |
+| 2 | **Consumo de una API REST** con **GET/POST/PUT/DELETE** sobre JSON | **Firebase Realtime Database** vía `ApiService` y los servicios de dominio |
+| 3 | **Despliegue del contenedor** en la nube | Imagen Docker (multi-stage → Nginx) ejecutada en Play with Docker |
 
 **Cuentas de prueba:** admin → `admin@mesaludica.cl` / `Admin123!` · cliente → `cliente@correo.cl` / `Cliente123!`
 
-## Consumo de JSON (Experiencia 3)
-El catálogo dejó de ser un arreglo estático y ahora se **consume desde un archivo JSON**
-mediante `HttpClient`:
+## Backend: Firebase Realtime Database (API REST)
+Todo el contenido de dominio se **consume y se manipula** desde **Firebase Realtime Database**
+por REST (cada nodo se accede con el sufijo `.json`):
 
-- **Archivo JSON:** `public/data/productos.json` (se sirve en `/data/productos.json`).
-- **Servicio:** `ProductoService` inyecta `HttpClient` y expone:
-  - `getProductos(): Observable<Producto[]>` → GET directo al JSON (al que se suscribe el
-    componente `catalogo-api`).
-  - `cargarCatalogo(): Promise<void>` → siembra el catálogo en el arranque
-    (`provideAppInitializer` en `app.config.ts`) para que las páginas tengan los datos desde
-    el primer render. Si falla, cae en los datos estáticos como respaldo.
-- **Persistencia (`localStorage`):** estrategia **JSON = semilla / `localStorage` = cambios**.
-  El catálogo del mantenedor, los usuarios registrados, la sesión activa, el carrito y el
-  historial de compras se guardan en `localStorage` (helper SSR-safe en
-  `services/storage.util.ts`), así **no se pierden al recargar**.
+- **URL centralizada:** `services/firebase.config.ts` (`FIREBASE_DB_URL`). Cambiar de backend
+  (JSON local, otra URL o una API real) es cambiar solo esa constante.
+- **Cliente REST genérico:** `services/api.service.ts` expone `get/post/put/patch/delete`.
+  Los servicios de dominio lo reutilizan.
+- **Nodos y operaciones:**
 
-> La página **Catálogo API** siempre hace un GET fresco al JSON (visible en la pestaña
-> *Network*), mientras que el resto de la app refleja los cambios guardados en `localStorage`.
+  | Nodo | Servicio | Operaciones REST |
+  |------|----------|------------------|
+  | `productos` | `ProductoService` | GET (catálogo) · PUT (crear/editar del mantenedor) · DELETE |
+  | `categorias` / `banners` | `ProductoService` | GET (portada y banners de categoría) |
+  | `usuarios` | `AuthService` | GET (login) · PUT (registro y edición de perfil) |
+  | `compras` | `ComprasService` | GET (historial) · PUT (registrar compra) |
+
+- **`localStorage`** queda solo para el estado **transitorio**: la **sesión activa** y el
+  **carrito** (helper SSR-safe en `services/storage.util.ts`). Al pagar, el carrito se
+  convierte en una **compra**, que sí se persiste en Firebase.
+- **Reglas de seguridad:** la base está en modo abierto (`.read`/`.write: true`) de forma
+  **consciente**, porque la app maneja su propia autenticación (no usa Firebase Auth). Es
+  suficiente para el contexto académico; en producción se cerrarían con tokens.
+- **Semillas (subir el JSON a Firebase):** en la raíz del proyecto hay archivos para poblar la
+  base con `Import JSON` (consola) o con un PUT REST:
+  `firebase-seed.json` (todo), `firebase-seed-usuarios.json`, `firebase-seed-categorias.json`,
+  `firebase-seed-banners.json`.
+
+## Contenerización y despliegue (Docker + Cloud)
+La app se empaqueta en una imagen Docker y se ejecuta en **Play with Docker**:
+
+- **`Dockerfile`** (multi-stage): **Node 22** compila Angular (`npm ci` + `ng build`) y **Nginx**
+  sirve los estáticos generados en `dist/mesa-ludica/browser/`.
+- **`nginx.conf`**: incluye el *fallback* de SPA (`try_files $uri /index.html`) para que al
+  recargar en rutas internas (`/categoria/...`, `/mis-compras`, etc.) **no dé 404**.
+- **`.dockerignore`**: deja fuera `node_modules`, `dist`, `.git`, etc. para una imagen liviana.
+
+```bash
+# Construir y probar el contenedor localmente (con Docker Desktop abierto)
+docker build -t mesaludica .
+docker run -p 80:80 mesaludica     # luego abrir http://localhost
+```
+
+En **Play with Docker**: clonar el repo → `cd mesa-ludica` → `docker build -t mesaludica .` →
+`docker run -d -p 80:80 mesaludica` → botón **OPEN PORT** (80) para la URL pública.
+(La app desplegada sigue leyendo/escribiendo en el mismo Firebase, por ser cliente-servidor.)
 
 ## Requisitos
 - Node.js 20.19+ / 22.12+ / 24+
-- Angular CLI 20 (`npm install -g @angular/cli@20`, opcional: se usa vía `npx`)
+- Angular CLI 20 (se usa vía `npx`)
+- Docker Desktop (para construir/ejecutar la imagen)
 
-## Cómo ejecutar
+## Cómo ejecutar (desarrollo)
 ```bash
 npm install         # instala dependencias (incluye Bootstrap y Compodoc)
 npx ng serve        # levanta el servidor en http://localhost:4200/
@@ -46,100 +74,91 @@ npm run compodoc:serve   # genera y sirve la documentación en http://localhost:
 ```
 
 ## Documentación (Compodoc)
-El código está documentado con comentarios **JSDoc** (`@description`, `@param`,
-`@returns`, `@usageNotes`). La documentación se genera con **Compodoc**:
-```bash
-npm run compodoc        # genera la doc en la carpeta /documentation
-npm run compodoc:serve  # la genera y la abre en el navegador (localhost:8080)
-```
-Usa `tsconfig.doc.json`, que incluye `src` y excluye los archivos `.spec.ts`.
+El código está documentado con comentarios **JSDoc** (`@description`, `@param`, `@returns`,
+`@usageNotes`). Se genera con **Compodoc** (`npm run compodoc` / `npm run compodoc:serve`),
+usando `tsconfig.doc.json` (incluye `src`, excluye los `.spec.ts`).
 
 ## Estructura
 ```
-public/
-└── data/productos.json  → catálogo consumido por HttpClient (archivo JSON)
+Dockerfile / nginx.conf / .dockerignore  → contenerización (build Angular + Nginx SPA)
+firebase-seed*.json                       → semillas para poblar Firebase (Import JSON / PUT)
 src/app/
 ├── components/
 │   ├── header/ footer/     → navbar adaptable al rol + pie de página
-│   ├── inicio/ categoria/ detalle/ → catálogo (consume el JSON vía el servicio)
-│   ├── catalogo-api/       → tabla que se suscribe al JSON (Observable + *ngIf/else)
-│   ├── registro/ login/ recuperar/ perfil/ → pantallas de cuenta (forms reactivos)
-│   ├── carrito/ pago/ mis-compras/ → carrito, pago simulado e historial
-│   └── admin/              → panel + mantenedor de productos (solo admin)
+│   ├── inicio/ categoria/ detalle/ → catálogo (consume productos/categorías/banners de Firebase)
+│   ├── catalogo-api/       → tabla que se suscribe al Observable del servicio (demo de consumo)
+│   ├── registro/ login/ recuperar/ perfil/ → cuentas (forms reactivos, async contra Firebase)
+│   ├── carrito/ pago/ mis-compras/ → carrito (localStorage), pago simulado e historial (Firebase)
+│   └── admin/              → panel + mantenedor de productos (CRUD real contra Firebase)
 ├── services/
-│   ├── producto.service.ts → consume el JSON (HttpClient) + CRUD del mantenedor (signal)
-│   ├── carrito.service.ts  → estado del carrito (signals) + control de stock + localStorage
-│   ├── auth.service.ts     → sesión y roles (signals) persistidos en localStorage
-│   ├── compras.service.ts  → historial de compras persistido en localStorage
-│   └── storage.util.ts     → helpers leer/guardar en localStorage (SSR-safe)
+│   ├── firebase.config.ts  → URL base de la Realtime Database (centralizada)
+│   ├── api.service.ts       → cliente REST genérico (GET/POST/PUT/PATCH/DELETE)
+│   ├── producto.service.ts  → catálogo, categorías y banners desde Firebase + CRUD (signal)
+│   ├── carrito.service.ts   → estado del carrito (signals) + control de stock + localStorage
+│   ├── auth.service.ts      → login/registro/perfil async contra Firebase; sesión en localStorage
+│   ├── compras.service.ts   → historial de compras contra Firebase
+│   └── storage.util.ts      → helpers leer/guardar en localStorage (SSR-safe)
 ├── guards/
-│   └── auth.guard.ts       → authGuard (sesión) y adminGuard (rol admin)
+│   └── auth.guard.ts        → authGuard (sesión) y adminGuard (rol admin)
 ├── validators/
 │   └── registro.validators.ts → validadores personalizados (fuerza, edad, contraseñas)
 ├── data/
-│   ├── productos.ts → categorías, banners y respaldo estático del catálogo
-│   └── usuarios.ts  → cuentas demo (admin y cliente)
+│   ├── productos.ts → respaldo estático (fallback offline de catálogo/categorías/banners)
+│   └── usuarios.ts  → cuentas demo de referencia para la semilla
 ├── models/
 │   ├── producto.ts  → interfaces Producto / Categoria
-│   └── usuario.ts   → tipo Rol e interfaz Usuario
-├── app.config.ts   → provideHttpClient + provideAppInitializer (siembra el catálogo)
+│   └── usuario.ts   → tipo Rol e interfaz Usuario (con id de Firebase)
+├── app.config.ts   → provideHttpClient + provideAppInitializer (precarga desde Firebase)
 ├── app.html         → <app-header> + <router-outlet> + <app-footer>
 └── app.routes.ts    → rutas de la aplicación (con guards)
 ```
 
 ## Conceptos aplicados
-### Experiencia 3 — Semana 7 (consumo de JSON)
-- **Archivo JSON:** `public/data/productos.json` en formato correcto (array de objetos).
-- **`HttpClient` + `Observable`:** `ProductoService` consume el JSON; `catalogo-api` se
-  **suscribe** en `ngOnInit` y muestra los datos en una tabla Bootstrap con `*ngIf/else`
-  y la plantilla `#noData` para el estado vacío.
-- **`provideHttpClient` + `provideAppInitializer`:** registro de `HttpClient` y precarga del
-  catálogo al arrancar.
-- **Persistencia con `localStorage`:** usuarios, sesión, carrito, historial y cambios del
-  mantenedor persisten entre recargas (helper SSR-safe).
-- **Control de stock:** el carrito no permite agregar/incrementar por sobre el stock.
+### Experiencia 3 — Semana 8 (API REST + Docker + Cloud)
+- **Consumo y manipulación de API REST:** `ApiService` genérico sobre `HttpClient` con
+  **GET/POST/PUT/DELETE**; los servicios de dominio (productos, usuarios, compras) lo usan.
+- **`Observable` / `Promise` / signals:** las operaciones devuelven `Observable`; el arranque
+  precarga los datos con `firstValueFrom`/`forkJoin`; las vistas reaccionan vía signals.
+- **Estados de carga y error:** spinners, mensajes y botones deshabilitados (`Guardando…`,
+  `Procesando…`) en mantenedor, login/registro/perfil, pago y mis-compras.
+- **Contenerización con Docker:** imagen multi-stage (Node build → Nginx) con `nginx.conf`
+  para el enrutado de la SPA.
+- **Despliegue en Cloud:** ejecución del contenedor en Play with Docker con URL pública.
 
-### Experiencia 2 — Semanas 4 a 6 (base)
-- **Migración HTML/CSS/Bootstrap a Angular:** diseño portado a `styles.scss` global;
-  Bootstrap instalado por npm y registrado en `angular.json` (sin CDN).
-- **Componentes reutilizables:** header y footer separados en sus propios componentes.
-- **Directivas `*ngFor` / `*ngIf`:** grillas de categorías y productos, descuentos, estados
-  vacíos, stock, contador del carrito y mensajes de validación.
-- **Formularios reactivos (S5):** registro con `FormGroup`, `FormBuilder` y `Validators`.
-  Validaciones: campos obligatorios **excepto dirección**, correo con formato email, **las
-  dos contraseñas deben coincidir** (validador de `FormGroup`), contraseña con **número,
-  mayúscula y carácter especial** y largo **6–18**, **edad mínima 13 años**, y botones
-  **Registrarme** / **Limpiar**.
-- **Pantallas de cuenta (S6):** `login`, `recuperar` y `perfil`, con formularios reactivos.
-- **Roles y sesión (S6):** `AuthService` (signals) con roles **cliente** y **admin**; el
-  header se adapta a la sesión y los *guards* protegen `/perfil`, `/pago`, `/mis-compras` y
-  `/admin`. Al **registrarse** se crea una cuenta de cliente con la sesión ya iniciada.
-- **Carrito y compra (S6):** `CarritoService` (signals), página `/carrito`, **pago simulado**
-  en `/pago` (registra en `ComprasService`) e historial en `/mis-compras`.
-- **Mantenedor de productos (S6):** panel `/admin` (solo admin) para registrar, editar y
-  eliminar productos.
+### Experiencia 2 y 3 — Semanas 4 a 7 (base)
+- **Migración HTML/CSS/Bootstrap a Angular**, componentes reutilizables (header/footer) y
+  directivas `*ngFor` / `*ngIf` (grillas, descuentos, estados vacíos, stock, contador de carrito).
+- **Formularios reactivos (S5):** registro con `FormGroup`, `FormBuilder` y `Validators`
+  (obligatorios excepto dirección, formato email, contraseñas iguales, contraseña con número +
+  mayúscula + carácter especial y largo 6–18, edad mínima 13).
+- **Roles, sesión y guards (S6):** roles cliente/admin; el header se adapta y los *guards*
+  protegen `/perfil`, `/pago`, `/mis-compras` y `/admin`.
+- **Carrito, pago simulado y mantenedor (S6):** carrito con control de stock, pago sin cobro
+  real y panel de administración.
+- **Consumo de JSON (S7):** base de `HttpClient` + `Observable` que en la S8 evolucionó a la
+  API REST completa sobre Firebase.
 
 ## Pruebas unitarias (Jasmine + Karma)
-Se corren con `ng test`. Cubren servicios, componentes, guards, formularios, consumo de JSON
-y flujo de compra:
-- `producto.service.spec.ts` — **consumo del JSON con `HttpTestingController`**, `getProductos()`
-  como Observable, y CRUD/descuento/formato del catálogo.
-- `catalogo-api.spec.ts` — el componente **se suscribe al JSON**, arma la tabla y maneja el error.
+Se corren con `ng test`. Cubren servicios, componentes, guards, formularios, consumo REST y el
+flujo de compra, usando `HttpTestingController` para simular Firebase:
+- `producto.service.spec.ts` — GET de catálogo/categorías/banners y **CRUD (PUT/DELETE)** del mantenedor.
+- `catalogo-api.spec.ts` — el componente **se suscribe** al Observable y arma la tabla; maneja el error.
+- `auth.service.spec.ts` — login (GET), registro (PUT), correo duplicado y sesión desde `localStorage`.
+- `compras.service.spec.ts` — registrar (GET+PUT), ids correlativos y carga del historial.
 - `carrito.service.spec.ts` — agregar, cantidades, total, vaciar y **control de stock**.
-- `auth.service.spec.ts` — login/logout, roles, registro y **recuperar sesión de `localStorage`**.
-- `compras.service.spec.ts` — registrar, `comprasDe`, ids correlativos y carga desde `localStorage`.
 - `auth.guard.spec.ts` — `authGuard` y `adminGuard` (bloqueo/redirección y acceso por rol).
-- `pago.spec.ts` — registra la compra y vacía el carrito (flujo de pago).
-- `registro.spec.ts` / `login.spec.ts` / `perfil.spec.ts` — formularios reactivos.
+- `pago.spec.ts` — registra la compra en Firebase y vacía el carrito (flujo de pago).
+- `mis-compras.spec.ts` — carga el historial desde Firebase y filtra por usuario.
+- `registro.spec.ts` / `login.spec.ts` / `perfil.spec.ts` — formularios reactivos + flujo async.
 - `app.spec.ts` — render del componente raíz.
 
 ## Rutas
 | Ruta                    | Componente  | Descripción                          |
 |-------------------------|-------------|--------------------------------------|
-| `/inicio`               | Inicio      | Portada con categorías               |
-| `/catalogo-api`         | CatalogoApi | **Catálogo consumido desde el JSON (HttpClient)** |
+| `/inicio`               | Inicio      | Portada con categorías (desde Firebase) |
 | `/categoria/:nombre`    | CategoriaPage | Catálogo filtrado por categoría    |
 | `/detalle/:id`          | Detalle     | Ficha de un producto                 |
+| `/catalogo-api`         | CatalogoApi | Tabla que consume el catálogo vía Observable (no está en el menú) |
 | `/registro`             | Registro    | Formulario reactivo con validaciones |
 | `/login`                | Login       | Inicio de sesión                     |
 | `/recuperar`            | Recuperar   | Recuperar contraseña                 |

@@ -75,8 +75,15 @@
                 ✔ ¡Cambios guardados correctamente!.
               </div>
 
+              <!-- Aviso de fallo de red al guardar en Firebase -->
+              <div class="alert alert-warning" *ngIf="errorRed">
+                ⚠ No se pudieron guardar los cambios. Revisa tu conexión e inténtalo de nuevo.
+              </div>
+
               <div class="d-flex flex-wrap gap-2 mt-3">
-                <button type="submit" class="boton">Guardar cambios</button>
+                <button type="submit" class="boton" [disabled]="guardando">
+                  {{ guardando ? 'Guardando…' : 'Guardar cambios' }}
+                </button>
                 <button type="button" class="boton boton-secundario" (click)="restablecer()">Restablecer</button>
               </div>
             </form>

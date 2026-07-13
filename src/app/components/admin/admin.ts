@@ -42,6 +42,15 @@ export class Admin {
   /** Mensaje de confirmación tras guardar (vacío si no hay que mostrarlo). */
   mensajeExito = '';
 
+  /** Mensaje de error si falla la operación contra Firebase. */
+  mensajeError = '';
+
+  /** true mientras se está guardando en Firebase (deshabilita el botón). */
+  guardando = false;
+
+  /** Id del producto que se está eliminando en Firebase; null si ninguno. */
+  eliminandoId: string | null = null;
+
   /**
    * @param fb Constructor de formularios reactivos de Angular.
    */
@@ -71,11 +80,14 @@ export class Admin {
   get descripcion() { return this.formulario.get('descripcion')!; }
 
   /**
-   * Guarda el producto: lo crea o lo actualiza según si se está editando.
+   * Guarda el producto en Firebase: lo crea (PUT) o lo actualiza (PUT) según
+   * si se está editando. Se suscribe al Observable del servicio y muestra el
+   * resultado (éxito o error) cuando la operación se confirma.
    */
   guardar(): void {
     this.enviado = true;
     this.mensajeExito = '';
+    this.mensajeError = '';
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
       return;
@@ -92,15 +104,24 @@ export class Admin {
     };
 
     const esEdicion = this.editandoId !== null;
-    if (esEdicion) {
-      this.productoService.actualizarProducto({ ...datos, id: this.editandoId! });
-    } else {
-      this.productoService.agregarProducto(datos);
-    }
-    this.cancelar();
-    this.mensajeExito = esEdicion
-      ? `✔ Producto "${datos.nombre}" actualizado correctamente.`
-      : `✔ Producto "${datos.nombre}" agregado al inventario.`;
+    const operacion = esEdicion
+      ? this.productoService.actualizarProducto({ ...datos, id: this.editandoId! })
+      : this.productoService.agregarProducto(datos);
+
+    this.guardando = true;
+    operacion.subscribe({
+      next: () => {
+        this.guardando = false;
+        this.cancelar();
+        this.mensajeExito = esEdicion
+          ? `✔ Producto "${datos.nombre}" actualizado correctamente.`
+          : `✔ Producto "${datos.nombre}" agregado al inventario.`;
+      },
+      error: () => {
+        this.guardando = false;
+        this.mensajeError = '⚠ No se pudo guardar el producto. Revisa tu conexión e inténtalo de nuevo.';
+      }
+    });
   }
 
   /**
@@ -123,14 +144,24 @@ export class Admin {
   }
 
   /**
-   * Elimina un producto del catálogo.
+   * Elimina un producto del catálogo en Firebase (DELETE).
    * @param id Id del producto a eliminar.
    */
   eliminar(id: string): void {
-    this.productoService.eliminarProducto(id);
-    if (this.editandoId === id) {
-      this.cancelar();
-    }
+    this.mensajeError = '';
+    this.eliminandoId = id;
+    this.productoService.eliminarProducto(id).subscribe({
+      next: () => {
+        this.eliminandoId = null;
+        if (this.editandoId === id) {
+          this.cancelar();
+        }
+      },
+      error: () => {
+        this.eliminandoId = null;
+        this.mensajeError = '⚠ No se pudo eliminar el producto. Revisa tu conexión e inténtalo de nuevo.';
+      }
+    });
   }
 
   /** Limpia el formulario y sale del modo edición. */

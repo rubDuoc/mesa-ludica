@@ -3,12 +3,16 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { CatalogoApi } from './catalogo-api';
 import { Producto } from '../../models/producto';
+import { FIREBASE_DB_URL } from '../../services/firebase.config';
 
-/** Catálogo simulado que devuelve el JSON en las pruebas. */
-const MOCK: Producto[] = [
-  { id: 'p-001', nombre: 'Catan', categoria: 'estrategia', precio: 31990, precio_antiguo: 39990, stock: 12, imagen: 'img/CATAN.jpg', descripcion: 'a' },
-  { id: 'p-002', nombre: 'UNO',   categoria: 'cartas',     precio: 5390,  precio_antiguo: null,  stock: 30, imagen: 'img/UNO.jpg',   descripcion: 'b' }
-];
+/** Base de la Realtime Database usada para verificar la URL de la petición. */
+const BASE = FIREBASE_DB_URL;
+
+/** Catálogo simulado tal como lo devuelve Firebase: objeto indexado por id. */
+const MOCK: Record<string, Producto> = {
+  'p-001': { id: 'p-001', nombre: 'Catan', categoria: 'estrategia', precio: 31990, precio_antiguo: 39990, stock: 12, imagen: 'img/CATAN.jpg', descripcion: 'a' },
+  'p-002': { id: 'p-002', nombre: 'UNO',   categoria: 'cartas',     precio: 5390,  precio_antiguo: null,  stock: 30, imagen: 'img/UNO.jpg',   descripcion: 'b' }
+};
 
 describe('CatalogoApi', () => {
   let httpMock: HttpTestingController;
@@ -24,11 +28,11 @@ describe('CatalogoApi', () => {
 
   afterEach(() => httpMock.verify());
 
-  it('se suscribe al JSON y muestra los productos en la tabla', () => {
+  it('se suscribe a Firebase (GET) y muestra los productos en la tabla', () => {
     const fixture = TestBed.createComponent(CatalogoApi);
     fixture.detectChanges(); // dispara ngOnInit
 
-    const req = httpMock.expectOne('/data/productos.json');
+    const req = httpMock.expectOne(`${BASE}/productos.json`);
     expect(req.request.method).toBe('GET');
     req.flush(MOCK);
     fixture.detectChanges();
@@ -43,7 +47,7 @@ describe('CatalogoApi', () => {
     const fixture = TestBed.createComponent(CatalogoApi);
     fixture.detectChanges();
 
-    httpMock.expectOne('/data/productos.json')
+    httpMock.expectOne(`${BASE}/productos.json`)
       .flush('error', { status: 500, statusText: 'Server Error' });
     fixture.detectChanges();
 

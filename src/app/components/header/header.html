@@ -15,7 +15,6 @@
 
         <!-- Catálogo: visible para visitantes y clientes, NO para el admin -->
         <ng-container *ngIf="!auth.esAdmin()">
-          <li class="nav-item"><a class="nav-link" routerLink="/catalogo-api" routerLinkActive="active">Catálogo API</a></li>
           <li class="nav-item"><a class="nav-link" routerLink="/categoria/estrategia" routerLinkActive="active">Estrategia</a></li>
           <li class="nav-item"><a class="nav-link" routerLink="/categoria/familiares" routerLinkActive="active">Familiares</a></li>
           <li class="nav-item"><a class="nav-link" routerLink="/categoria/fiesta" routerLinkActive="active">Fiesta</a></li>

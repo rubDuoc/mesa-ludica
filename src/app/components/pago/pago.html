@@ -41,8 +41,15 @@
                   <strong>Total a pagar</strong>
                   <strong>{{ formatearPrecio(carrito.total()) }}</strong>
                 </div>
+                <!-- Aviso de fallo de red al registrar la compra -->
+                <div class="alert alert-warning" *ngIf="errorPago">
+                  ⚠ No se pudo registrar la compra. Revisa tu conexión e inténtalo de nuevo.
+                </div>
+
                 <div class="d-grid gap-2">
-                  <button type="button" class="boton" (click)="pagar()">Pagar ahora</button>
+                  <button type="button" class="boton" (click)="pagar()" [disabled]="procesando">
+                    {{ procesando ? 'Procesando…' : 'Pagar ahora' }}
+                  </button>
                   <a class="boton boton-secundario" routerLink="/carrito">Volver al carrito</a>
                 </div>
               </div>

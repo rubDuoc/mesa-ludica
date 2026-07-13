@@ -33,8 +33,14 @@ export class Perfil {
   /** Se pone en true al intentar guardar, para desplegar los errores. */
   enviado = false;
 
-  /** Indica que los cambios pasaron la validación (mensaje de éxito). */
+  /** Indica que los cambios se guardaron correctamente (mensaje de éxito). */
   guardado = false;
+
+  /** true mientras se guardan los cambios en Firebase. */
+  guardando = false;
+
+  /** Indica un fallo de red al guardar en Firebase. */
+  errorRed = false;
 
   /**
    * @param fb Constructor de formularios reactivos de Angular.
@@ -65,19 +71,29 @@ export class Perfil {
   guardar(): void {
     this.enviado = true;
     this.guardado = false;
+    this.errorRed = false;
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
       return;
     }
     const v = this.formulario.value;
+    this.guardando = true;
     this.auth.actualizarPerfil({
       nombre: v.nombre,
       usuario: v.usuario,
       email: v.email,
       telefono: v.telefono,
       direccion: v.direccion
+    }).subscribe({
+      next: () => {
+        this.guardando = false;
+        this.guardado = true;
+      },
+      error: () => {
+        this.guardando = false;
+        this.errorRed = true;
+      }
     });
-    this.guardado = true;
   }
 
   /** Restablece el formulario a los datos actuales del usuario. */

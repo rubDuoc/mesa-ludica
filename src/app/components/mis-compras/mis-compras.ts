@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ComprasService, Compra } from '../../services/compras.service';
@@ -7,8 +7,9 @@ import { ProductoService } from '../../services/producto.service';
 
 /**
  * @description
- * Página de monitoreo de compras del usuario con sesión. Lista las compras
- * (pagos simulados) que ha realizado, con su detalle y total.
+ * Página de monitoreo de compras del usuario con sesión. Carga el historial
+ * desde Firebase (GET) al iniciar y lista las compras que ha realizado el
+ * usuario, con su detalle y total.
  */
 @Component({
   selector: 'app-mis-compras',
@@ -16,10 +17,24 @@ import { ProductoService } from '../../services/producto.service';
   templateUrl: './mis-compras.html',
   styleUrl: './mis-compras.scss'
 })
-export class MisCompras {
+export class MisCompras implements OnInit {
   private readonly compras = inject(ComprasService);
   private readonly auth = inject(AuthService);
   private readonly productoService = inject(ProductoService);
+
+  /** Indica que el historial se está cargando desde Firebase. */
+  cargando = true;
+
+  /** Indica que la carga del historial falló. */
+  error = false;
+
+  /** Carga el historial de compras desde Firebase al iniciar. */
+  ngOnInit(): void {
+    this.compras.cargarHistorial().subscribe({
+      next: () => { this.cargando = false; },
+      error: () => { this.error = true; this.cargando = false; }
+    });
+  }
 
   /**
    * Compras del usuario con sesión activa.

@@ -37,6 +37,12 @@ export class Registro {
   /** Indica que el correo ingresado ya está registrado. */
   emailExistente = false;
 
+  /** true mientras se registra el usuario en Firebase. */
+  cargando = false;
+
+  /** Indica un fallo de red al consultar Firebase. */
+  errorRed = false;
+
   /**
    * @param fb Constructor de formularios reactivos de Angular.
    * @param auth Servicio de autenticación (registro e inicio de sesión).
@@ -84,23 +90,33 @@ export class Registro {
   enviar(): void {
     this.enviado = true;
     this.emailExistente = false;
+    this.errorRed = false;
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
       return;
     }
     const v = this.formulario.value;
-    if (this.auth.emailRegistrado(v.email)) {
-      this.emailExistente = true;
-      return;
-    }
+    this.cargando = true;
     this.auth.registrar({
       nombre: v.nombre,
       usuario: v.usuario,
       email: v.email,
       password: v.contrasena,
       direccion: v.direccion
+    }).subscribe({
+      next: () => {
+        this.cargando = false;
+        this.router.navigate(['/inicio']);
+      },
+      error: (e: Error) => {
+        this.cargando = false;
+        if (e.message === 'EMAIL_EXISTENTE') {
+          this.emailExistente = true;
+        } else {
+          this.errorRed = true;
+        }
+      }
     });
-    this.router.navigate(['/inicio']);
   }
 
   /** Reinicia el formulario a su estado inicial y oculta los errores. */

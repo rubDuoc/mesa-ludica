@@ -15,11 +15,11 @@ import { Usuario } from '../models/usuario';
  */
 export const USUARIOS: Usuario[] = [
   {
-    nombre: 'Administrador', usuario: 'admin', email: 'admin@mesaludica.cl',
+    id: 'u-001', nombre: 'Administrador', usuario: 'admin', email: 'admin@mesaludica.cl',
     password: 'Admin123!', telefono: '900000000', direccion: 'Oficina central', rol: 'admin'
   },
   {
-    nombre: 'Cliente Demo', usuario: 'clientedemo', email: 'cliente@correo.cl',
+    id: 'u-002', nombre: 'Cliente Demo', usuario: 'clientedemo', email: 'cliente@correo.cl',
     password: 'Cliente123!', telefono: '912345678', direccion: 'Av. Siempre Viva 742', rol: 'cliente'
   }
 ];

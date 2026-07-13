@@ -16,6 +16,9 @@
             <!-- Mensaje de éxito tras agregar o actualizar (*ngIf) -->
             <div class="alert alert-success" *ngIf="mensajeExito">{{ mensajeExito }}</div>
 
+            <!-- Mensaje de error si falla la operación contra Firebase -->
+            <div class="alert alert-danger" *ngIf="mensajeError">{{ mensajeError }}</div>
+
             <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
               <div class="mb-3">
                 <label for="nombre" class="form-label">Nombre</label>
@@ -101,7 +104,9 @@
               </div>
 
               <div class="d-flex flex-wrap gap-2">
-                <button type="submit" class="boton">{{ editandoId ? 'Guardar cambios' : 'Agregar producto' }}</button>
+                <button type="submit" class="boton" [disabled]="guardando">
+                  {{ guardando ? 'Guardando…' : (editandoId ? 'Guardar cambios' : 'Agregar producto') }}
+                </button>
                 <button type="button" class="boton boton-secundario" (click)="cancelar()">Cancelar</button>
               </div>
             </form>
@@ -134,7 +139,9 @@
                     <td class="text-end" [class.text-danger]="p.stock === 0">{{ p.stock }}</td>
                     <td class="text-end text-nowrap">
                       <button type="button" class="boton boton-secundario btn-sm" (click)="editar(p)">Editar</button>
-                      <button type="button" class="boton btn-sm ms-1" (click)="eliminar(p.id)">Eliminar</button>
+                      <button type="button" class="boton btn-sm ms-1" (click)="eliminar(p.id)" [disabled]="eliminandoId === p.id">
+                        {{ eliminandoId === p.id ? 'Eliminando…' : 'Eliminar' }}
+                      </button>
                     </td>
                   </tr>
                 </tbody>

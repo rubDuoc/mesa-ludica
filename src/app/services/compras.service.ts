@@ -1,30 +1,32 @@
 /* ============================================================
    Mesa Lúdica - Servicio de compras
-   DSY2202 - Experiencia 3, Semana 7
+   DSY2202 - Experiencia 3, Semana 8
 
-   Registra las compras (pagos simulados) para que cada usuario pueda
-   monitorear su historial. El historial se persiste en localStorage para
-   que no se pierda al recargar la página.
+   Registra y consulta las compras (pagos simulados) desde la Realtime
+   Database de Firebase mediante REST (GET/PUT). Cada compra queda asociada
+   al correo del usuario, para que pueda monitorear su historial.
    ============================================================ */
 
-import { Injectable, signal, effect } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map, switchMap, tap } from 'rxjs/operators';
+import { ApiService } from './api.service';
 import { ItemCarrito } from './carrito.service';
-import { leerStorage, guardarStorage } from './storage.util';
 
-/** Clave de localStorage para el historial de compras. */
-const CLAVE_COMPRAS = 'ml_compras';
+/** Nodo de la Realtime Database donde vive el historial de compras. */
+const NODO = 'compras';
 
 /**
  * @description
  * Representa una compra realizada por un usuario.
  */
 export interface Compra {
-  /** Identificador de la compra (correlativo simple). */
-  id: number;
+  /** Identificador de la compra en Firebase (ej: 'c-001'). */
+  id: string;
   /** Correo del usuario que compró. */
   email: string;
-  /** Fecha y hora de la compra. */
-  fecha: Date;
+  /** Fecha y hora de la compra en formato ISO. */
+  fecha: string;
   /** Líneas compradas (copia de los items del carrito). */
   items: ItemCarrito[];
   /** Monto total pagado. */
@@ -33,40 +35,53 @@ export interface Compra {
 
 /**
  * @description
- * Servicio que mantiene el historial de compras simuladas usando signals.
+ * Servicio que registra las compras en Firebase (PUT) y consulta el historial
+ * (GET). Mantiene una copia reactiva en un signal para que la vista "Mis
+ * compras" muestre los datos sin repetir peticiones en cada lectura.
  */
 @Injectable({ providedIn: 'root' })
 export class ComprasService {
-  /** Historial completo de compras (todos los usuarios), leído de localStorage. */
-  private readonly historial = signal<Compra[]>(leerStorage<Compra[]>(CLAVE_COMPRAS, []));
+  private readonly api = inject(ApiService);
 
-  /** Correlativo para asignar id a cada nueva compra. */
-  private siguienteId = 1;
+  /** Historial completo de compras (todos los usuarios), cargado desde Firebase. */
+  private readonly historial = signal<Compra[]>([]);
 
-  constructor() {
-    // El id correlativo continúa a partir del mayor id ya guardado.
-    this.siguienteId = this.historial().reduce((max, c) => Math.max(max, c.id), 0) + 1;
-    // Persiste el historial en localStorage cada vez que cambia.
-    effect(() => guardarStorage(CLAVE_COMPRAS, this.historial()));
+  /**
+   * Carga el historial completo desde Firebase (GET) al signal.
+   * @returns Observable con el arreglo de compras.
+   */
+  cargarHistorial(): Observable<Compra[]> {
+    return this.api.get<Record<string, Compra> | null>(NODO).pipe(
+      map(obj => (obj ? Object.values(obj) : [])),
+      tap(lista => this.historial.set(lista))
+    );
   }
 
   /**
-   * Registra una nueva compra en el historial.
+   * Registra una nueva compra en Firebase (PUT con id correlativo). Antes hace
+   * un GET para calcular el siguiente id.
    * @param email Correo del usuario que compra.
    * @param items Líneas del carrito compradas.
    * @param total Monto total pagado.
-   * @returns La compra registrada.
+   * @returns Observable con la compra registrada.
    */
-  registrar(email: string, items: ItemCarrito[], total: number): Compra {
-    const compra: Compra = {
-      id: this.siguienteId++,
-      email,
-      fecha: new Date(),
-      items: items.map(i => ({ ...i })),
-      total
-    };
-    this.historial.update(h => [compra, ...h]);
-    return compra;
+  registrar(email: string, items: ItemCarrito[], total: number): Observable<Compra> {
+    return this.api.get<Record<string, Compra> | null>(NODO).pipe(
+      switchMap(obj => {
+        const lista = obj ? Object.values(obj) : [];
+        const compra: Compra = {
+          id: this.generarId(lista),
+          email,
+          fecha: new Date().toISOString(),
+          items: items.map(i => ({ ...i })),
+          total
+        };
+        return this.api.put<Compra>(`${NODO}/${compra.id}`, compra).pipe(
+          map(() => compra),
+          tap(c => this.historial.update(h => [c, ...h]))
+        );
+      })
+    );
   }
 
   /**
@@ -75,6 +90,21 @@ export class ComprasService {
    * @returns Compras asociadas a ese correo.
    */
   comprasDe(email: string): Compra[] {
-    return this.historial().filter(c => c.email === email);
+    return this.historial()
+      .filter(c => c.email === email)
+      .sort((a, b) => b.fecha.localeCompare(a.fecha));
+  }
+
+  /**
+   * Genera un id correlativo para una compra nueva (formato 'c-XXX').
+   * @param lista Compras existentes de las que se calcula el siguiente id.
+   * @returns Nuevo identificador.
+   */
+  private generarId(lista: Compra[]): string {
+    const numeros = lista
+      .map(c => parseInt((c.id ?? '').replace('c-', ''), 10))
+      .filter(n => !isNaN(n));
+    const max = numeros.length ? Math.max(...numeros) : 0;
+    return 'c-' + String(max + 1).padStart(3, '0');
   }
 }

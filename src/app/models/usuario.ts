@@ -16,6 +16,8 @@ export type Rol = 'cliente' | 'admin';
  * Representa un usuario de la aplicación.
  */
 export interface Usuario {
+  /** Identificador único del usuario en Firebase (ej: 'u-001'). */
+  id: string;
   /** Nombre visible del usuario. */
   nombre: string;
   /** Nombre de usuario (opcional). */

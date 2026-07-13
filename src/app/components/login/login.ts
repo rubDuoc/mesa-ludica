@@ -26,6 +26,12 @@ export class Login {
   /** Indica que las credenciales no coinciden con ningún usuario. */
   credencialesInvalidas = false;
 
+  /** true mientras se valida la sesión contra Firebase. */
+  cargando = false;
+
+  /** Indica un fallo de red al consultar Firebase. */
+  errorRed = false;
+
   /** Controla si la contraseña se muestra en texto plano (botón del ojo). */
   verContrasena = false;
 
@@ -57,16 +63,26 @@ export class Login {
   iniciarSesion(): void {
     this.enviado = true;
     this.credencialesInvalidas = false;
+    this.errorRed = false;
     if (this.formulario.invalid) {
       this.formulario.markAllAsTouched();
       return;
     }
-    const ok = this.auth.login(this.email.value, this.contrasena.value);
-    if (ok) {
-      this.router.navigate(['/inicio']);
-    } else {
-      this.credencialesInvalidas = true;
-    }
+    this.cargando = true;
+    this.auth.login(this.email.value, this.contrasena.value).subscribe({
+      next: ok => {
+        this.cargando = false;
+        if (ok) {
+          this.router.navigate(['/inicio']);
+        } else {
+          this.credencialesInvalidas = true;
+        }
+      },
+      error: () => {
+        this.cargando = false;
+        this.errorRed = true;
+      }
+    });
   }
 
   /** Limpia el formulario y oculta mensajes. */

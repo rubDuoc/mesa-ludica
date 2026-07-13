@@ -41,6 +41,9 @@ __screenshots__/
 # Compodoc (documentación generada)
 /documentation
 
+# Semillas de Firebase (contienen datos de demo con contraseñas; solo para poblar la BD)
+firebase-seed*.json
+
 # System files
 .DS_Store
 Thumbs.db

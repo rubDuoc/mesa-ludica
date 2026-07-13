@@ -7,6 +7,20 @@
   <section class="seccion">
     <div class="container">
 
+      <!-- Estado: cargando el historial desde Firebase -->
+      <div *ngIf="cargando" class="text-center py-5">
+        <div class="spinner-border" role="status" aria-hidden="true"></div>
+        <p class="mt-2 mb-0">Cargando tus compras…</p>
+      </div>
+
+      <!-- Estado: error de red -->
+      <div *ngIf="error" class="alert alert-danger">
+        No se pudo cargar tu historial. Intenta nuevamente más tarde.
+      </div>
+
+      <!-- Contenido cuando ya cargó -->
+      <ng-container *ngIf="!cargando && !error">
+
       <!-- Sin compras (*ngIf con else) -->
       <div class="text-center py-5" *ngIf="misCompras.length === 0; else listado">
         <h2 class="h4">Todavía no tienes compras</h2>
@@ -33,6 +47,8 @@
           </div>
         </div>
       </ng-template>
+
+      </ng-container>
 
     </div>
   </section>

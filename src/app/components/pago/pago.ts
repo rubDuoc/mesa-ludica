@@ -32,6 +32,12 @@ export class Pago {
   /** Monto que se pagó (se guarda antes de vaciar el carrito). */
   totalPagado = 0;
 
+  /** true mientras se registra la compra en Firebase. */
+  procesando = false;
+
+  /** Indica un fallo de red al registrar la compra. */
+  errorPago = false;
+
   /**
    * Formatea un precio al estilo chileno (delegado al servicio de productos).
    * @param n Monto a formatear.
@@ -50,10 +56,21 @@ export class Pago {
     if (items.length === 0) {
       return;
     }
-    this.totalPagado = this.carrito.total();
+    const total = this.carrito.total();
     const email = this.auth.usuario()?.email ?? 'desconocido';
-    this.compras.registrar(email, items, this.totalPagado);
-    this.carrito.vaciar();
-    this.pagado = true;
+    this.procesando = true;
+    this.errorPago = false;
+    this.compras.registrar(email, items, total).subscribe({
+      next: () => {
+        this.procesando = false;
+        this.totalPagado = total;
+        this.carrito.vaciar();
+        this.pagado = true;
+      },
+      error: () => {
+        this.procesando = false;
+        this.errorPago = true;
+      }
+    });
   }
 }
