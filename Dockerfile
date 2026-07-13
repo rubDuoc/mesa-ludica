@@ -22,8 +22,13 @@ RUN npm run build
 # ----- Etapa 2: servir los estáticos con Nginx -----
 FROM nginx:alpine AS prod
 
-# Configuración de Nginx con fallback para las rutas de la SPA
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Puerto por defecto (80 en local). El Cloud puede sobreescribir esta variable
+# y Nginx la aplicará gracias a la sustitución de plantillas (envsubst).
+ENV PORT=80
+
+# Configuración de Nginx como plantilla: el entrypoint de la imagen sustituye
+# ${PORT} y genera /etc/nginx/conf.d/default.conf al arrancar el contenedor.
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
 # Copia el resultado del build de Angular al directorio público de Nginx.
 # Angular 20 genera la carpeta browser dentro de dist/<nombre-proyecto>/.
