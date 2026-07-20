@@ -1,15 +1,19 @@
 # Mesa Lúdica 🎲 — versión Angular
-**Asignatura:** Desarrollo Full Stack II (DSY2202) — Experiencia 3 (Semana 8)
-**Actividad:** Sumativa 3 — *Los archivos en las APIs REST* (consumo y manipulación de una
-API REST con los métodos GET/POST/PUT/DELETE, contenerización con Docker y despliegue en Cloud).
-Continúa el proyecto de las Experiencias 2 y 3 (Semanas 4 a 7).
+**Asignatura:** Desarrollo Full Stack II (DSY2202) — Evaluación Final Transversal (Semana 9)
+**Proyecto:** *Mesa Lúdica*, tienda de juegos de mesa construida de forma incremental a lo largo
+de las Experiencias 1, 2 y 3 (Semanas 1 a 8): FrontEnd HTML/CSS/Bootstrap migrado a **Angular**,
+formularios reactivos con validaciones, **pruebas unitarias** (Jasmine + Karma), consumo de una
+**API REST** (GET/POST/PUT/DELETE) sobre Firebase, **documentación** con Compodoc, contenerización
+con **Docker** y **despliegue en la nube**.
 
-## Resumen de la entrega (pauta S8)
+## Resumen de la entrega
 | # | Criterio | Dónde está |
 |---|----------|------------|
-| 1 | Git / trabajo colaborativo + **despliegue en Cloud** | Repositorio + Trello + **Play with Docker** (`Dockerfile` + `nginx.conf`) |
+| 1 | Git / trabajo colaborativo + **despliegue en Cloud** | Repositorio + Trello + **Render** (imagen Docker: `Dockerfile` + `nginx.conf`) |
 | 2 | **Consumo de una API REST** con **GET/POST/PUT/DELETE** sobre JSON | **Firebase Realtime Database** vía `ApiService` y los servicios de dominio |
-| 3 | **Despliegue del contenedor** en la nube | Imagen Docker (multi-stage → Nginx) ejecutada en Play with Docker |
+| 3 | **Despliegue del contenedor** en la nube | Imagen Docker (multi-stage → Nginx) ejecutada en **Render** con URL pública |
+| 4 | **Pruebas unitarias** (Jasmine + Karma) | 55 specs sobre servicios, componentes, guards y formularios (`ng test`) |
+| 5 | **Documentación** del FrontEnd | Generada con **Compodoc** (`npm run compodoc`) |
 
 **Cuentas de prueba:** admin → `admin@mesaludica.cl` / `Admin123!` · cliente → `cliente@correo.cl` / `Cliente123!`
 
@@ -42,12 +46,13 @@ por REST (cada nodo se accede con el sufijo `.json`):
   `firebase-seed-banners.json`.
 
 ## Contenerización y despliegue (Docker + Cloud)
-La app se empaqueta en una imagen Docker y se ejecuta en **Play with Docker**:
+La app se empaqueta en una imagen Docker y se despliega en la nube en **Render**:
 
 - **`Dockerfile`** (multi-stage): **Node 22** compila Angular (`npm ci` + `ng build`) y **Nginx**
   sirve los estáticos generados en `dist/mesa-ludica/browser/`.
 - **`nginx.conf`**: incluye el *fallback* de SPA (`try_files $uri /index.html`) para que al
-  recargar en rutas internas (`/categoria/...`, `/mis-compras`, etc.) **no dé 404**.
+  recargar en rutas internas (`/categoria/...`, `/mis-compras`, etc.) **no dé 404**. Escucha en
+  `${PORT}`, el puerto que el proveedor cloud inyecta en tiempo de ejecución.
 - **`.dockerignore`**: deja fuera `node_modules`, `dist`, `.git`, etc. para una imagen liviana.
 
 ```bash
@@ -56,9 +61,14 @@ docker build -t mesaludica .
 docker run -p 80:80 mesaludica     # luego abrir http://localhost
 ```
 
-En **Play with Docker**: clonar el repo → `cd mesa-ludica` → `docker build -t mesaludica .` →
-`docker run -d -p 80:80 mesaludica` → botón **OPEN PORT** (80) para la URL pública.
-(La app desplegada sigue leyendo/escribiendo en el mismo Firebase, por ser cliente-servidor.)
+En **Render**: se crea un *Web Service* apuntando al repositorio con entorno **Docker**; Render
+construye la imagen a partir del `Dockerfile`, inyecta la variable `PORT` (consumida por
+`nginx.conf`) y publica una **URL pública permanente**. (La app desplegada sigue leyendo/escribiendo
+en el mismo Firebase, por ser cliente-servidor.)
+
+> Nota: originalmente se contempló *Play with Docker*, pero ese servicio fue descontinuado y sus
+> sesiones expiraban a las 4 horas; **Render** ejecuta la misma imagen Docker y entrega una URL
+> pública estable.
 
 ## Requisitos
 - Node.js 20.19+ / 22.12+ / 24+
@@ -123,7 +133,7 @@ src/app/
   `Procesando…`) en mantenedor, login/registro/perfil, pago y mis-compras.
 - **Contenerización con Docker:** imagen multi-stage (Node build → Nginx) con `nginx.conf`
   para el enrutado de la SPA.
-- **Despliegue en Cloud:** ejecución del contenedor en Play with Docker con URL pública.
+- **Despliegue en Cloud:** ejecución del contenedor en Render con URL pública permanente.
 
 ### Experiencia 2 y 3 — Semanas 4 a 7 (base)
 - **Migración HTML/CSS/Bootstrap a Angular**, componentes reutilizables (header/footer) y

@@ -1,0 +1,53 @@
+========================================================================
+ MESA LUDICA - Librerias adicionales instaladas
+ Desarrollo Full Stack II (DSY2202) - Evaluacion Final Transversal (Sem 9)
+========================================================================
+
+El proyecto se genero con Angular CLI 20 (comando "ng new"), por lo que las
+dependencias base de Angular, TypeScript, RxJS, Zone.js, Jasmine y Karma vienen
+incluidas por defecto en el scaffold y NO se consideran librerias adicionales.
+
+A continuacion se detallan UNICAMENTE las librerias que se instalaron de forma
+adicional al scaffold por defecto:
+
+------------------------------------------------------------------------
+1) BOOTSTRAP  (dependencia de produccion)
+------------------------------------------------------------------------
+- Paquete   : bootstrap
+- Version   : ^5.3.3
+- Tipo      : dependencia (dependencies)
+- Proposito : Framework CSS/JS para el diseno responsivo del FrontEnd
+              (grid de 12 columnas, componentes, utilidades) y comportamiento
+              interactivo (navbar colapsable, dropdowns, etc.).
+- Instalacion:
+      npm install bootstrap
+- Integracion (archivo angular.json):
+      * CSS : "node_modules/bootstrap/dist/css/bootstrap.min.css"
+      * JS  : "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+- Uso: clases de Bootstrap en las plantillas HTML de los componentes
+       (header, catalogo, formularios, tablas del mantenedor, etc.).
+
+------------------------------------------------------------------------
+2) COMPODOC  (dependencia de desarrollo)
+------------------------------------------------------------------------
+- Paquete   : @compodoc/compodoc
+- Version   : ^1.1.26
+- Tipo      : dependencia de desarrollo (devDependencies)
+- Proposito : Generacion automatica de la documentacion tecnica del FrontEnd
+              a partir de los comentarios JSDoc del codigo (componentes,
+              servicios, guards, modelos, rutas y cobertura de documentacion).
+- Instalacion:
+      npm install --save-dev @compodoc/compodoc
+- Scripts definidos en package.json:
+      * npm run compodoc         -> genera la documentacion en /documentation
+      * npm run compodoc:serve   -> genera y la sirve en http://localhost:8080/
+- Configuracion: usa el archivo tsconfig.doc.json
+      (incluye "src/**/*.ts" y excluye los archivos de prueba "*.spec.ts").
+
+========================================================================
+ Como reconstruir el entorno desde cero:
+      npm install
+ (npm install lee package.json e instala TODAS las dependencias listadas,
+  incluidas bootstrap y @compodoc/compodoc, sin necesidad de instalarlas
+  una por una.)
+========================================================================
